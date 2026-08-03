@@ -1,5 +1,5 @@
 import type { FormDefinition } from "../types";
-import { useTranslation } from "../i18n";
+import { useTranslation } from "../i18n/useTranslation";
 import styles from "./DisclaimerBadge.module.css";
 
 const ACCENT_CLASS: Record<NonNullable<FormDefinition["accent"]>, string> = {

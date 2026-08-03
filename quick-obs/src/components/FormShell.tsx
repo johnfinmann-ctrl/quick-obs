@@ -1,5 +1,5 @@
 import type { FormDefinition } from "../types";
-import { useTranslation } from "../i18n";
+import { useTranslation } from "../i18n/useTranslation";
 import { BackButton } from "./BackButton";
 import { DisclaimerBadge } from "./DisclaimerBadge";
 import { PendingTranslationNote } from "./PendingTranslationNote";

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { LanguageProvider } from "./i18n";
+import { LanguageProvider } from "./i18n/LanguageProvider";
 import { ThemeProvider } from "./theme/ThemeProvider";
 import { DemoBanner } from "./components/DemoBanner";
 import { SettingsPanel } from "./components/SettingsPanel";

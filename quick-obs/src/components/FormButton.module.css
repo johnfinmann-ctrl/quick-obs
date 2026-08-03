@@ -20,6 +20,15 @@
   background: var(--qo-color-primary-dark);
 }
 
+@media (min-width: 1000px) {
+  .button {
+    min-height: 64px;
+    padding: var(--qo-space-4) var(--qo-space-6);
+    font-size: var(--qo-font-size-xl);
+    border-radius: var(--qo-radius-lg);
+  }
+}
+
 .icon {
   flex-shrink: 0;
 }

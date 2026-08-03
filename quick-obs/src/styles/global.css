@@ -70,6 +70,9 @@ button {
 :root[data-qo-theme="dark"] {
   --qo-color-border: #33422e;
   --qo-color-text-on-light: var(--qo-color-text-on-dark);
+  /* #A9D9A0 mod #121811 giver kontrastforhold ca. 11:1 (WCAG AAA for
+     stor tekst, AA for normal tekst). Bevidst adskilt fra knapfarven. */
+  --qo-color-heading: #a9d9a0;
 }
 
 @media (prefers-reduced-motion: reduce) {

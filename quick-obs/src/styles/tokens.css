@@ -18,6 +18,11 @@
   --qo-color-border: #c7cec2;
   --qo-color-focus: #0b57d0;
 
+  /* Semantisk overskriftsfarve - adskilt fra --qo-color-primary, saa moerkt
+     tema kan give overskrifter tilstraekkelig kontrast uden at aendre
+     knapfarven (som forbliver moerkegroen med lys tekst i begge temaer). */
+  --qo-color-heading: var(--qo-color-primary);
+
   /* Typografi */
   --qo-font-sans:
     "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -41,10 +46,29 @@
   --qo-radius: 12px;
   --qo-radius-lg: 16px;
   --qo-touch-target-min: 56px;
+
+  /* Indholdsbredde - mobil (uaendret). Udvides paa bredere skaerme
+     herunder, saa Quick-Obs ikke fremstaar som en lille mobilapp midt
+     paa en stor, tom desktop-skaerm. */
   --qo-max-content-width: 640px;
 
   /* Skygger (afdaempet, ingen dekoration uden funktion) */
   --qo-shadow-elevated: 0 2px 8px rgba(18, 24, 17, 0.16);
+}
+
+/* iPad staaende og opefter: to kolonner, lidt mere luft */
+@media (min-width: 720px) {
+  :root {
+    --qo-max-content-width: 720px;
+  }
+}
+
+/* iPad liggende og desktop: bredere samlet indhold (~800-900px) saa
+   to-kolonne-layoutet faktisk udnytter den store skaerm. */
+@media (min-width: 1000px) {
+  :root {
+    --qo-max-content-width: 860px;
+  }
 }
 
 @media (prefers-color-scheme: dark) {

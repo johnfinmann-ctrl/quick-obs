@@ -1,4 +1,4 @@
-import { useTranslation } from "../i18n";
+import { useTranslation } from "../i18n/useTranslation";
 import styles from "./DemoBanner.module.css";
 
 /**

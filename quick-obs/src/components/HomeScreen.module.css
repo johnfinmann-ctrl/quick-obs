@@ -16,7 +16,7 @@
 .title {
   font-size: var(--qo-font-size-2xl);
   font-weight: 800;
-  color: var(--qo-color-primary);
+  color: var(--qo-color-heading);
   margin: 0;
   letter-spacing: -0.01em;
 }
@@ -34,11 +34,40 @@
   gap: var(--qo-space-3);
 }
 
-/* iPad og bredere: to kolonner, men bevar fuld bredde paa hver knap for
-   store beroeringsflader og lav visuel kompleksitet */
+/* iPad staaende og opefter: to kolonner, men bevar fuld bredde paa hver
+   knap for store beroeringsflader og lav visuel kompleksitet. Den femte
+   knap (ulige antal) lander alene i venstre kolonne via normal
+   grid-auto-placement og strækkes ikke over begge kolonner. */
 @media (min-width: 720px) {
   .formList {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    gap: var(--qo-space-4);
+  }
+}
+
+/* iPad liggende og desktop: mere luft og lidt stoerre typografi, saa
+   indholdet udnytter den bredere --qo-max-content-width i stedet for at
+   fremstaa som en lille mobilskaerm midt i en stor tom flade. */
+@media (min-width: 1000px) {
+  .container {
+    padding-top: var(--qo-space-6);
+    gap: var(--qo-space-7);
+  }
+
+  .header {
+    padding-top: var(--qo-space-5);
+  }
+
+  .title {
+    font-size: 2.25rem;
+  }
+
+  .subtitle {
+    font-size: var(--qo-font-size-lg);
+  }
+
+  .formList {
+    gap: var(--qo-space-5);
   }
 }

@@ -2,7 +2,7 @@ import { FileText, HeartPulse, ClipboardList, PlaneTakeoff, LifeBuoy } from "luc
 import type { LucideIcon } from "lucide-react";
 import { FORM_DEFINITIONS } from "../config/forms";
 import type { FormKind } from "../types";
-import { useTranslation } from "../i18n";
+import { useTranslation } from "../i18n/useTranslation";
 import { FormButton } from "./FormButton";
 import styles from "./HomeScreen.module.css";
 

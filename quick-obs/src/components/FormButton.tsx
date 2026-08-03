@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { useTranslation } from "../i18n";
+import { useTranslation } from "../i18n/useTranslation";
 import styles from "./FormButton.module.css";
 
 interface FormButtonProps {

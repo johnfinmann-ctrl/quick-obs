@@ -6,8 +6,8 @@
   min-width: 56px;
   padding: var(--qo-space-2) var(--qo-space-4);
   background: transparent;
-  border: 2px solid var(--qo-color-primary);
-  color: var(--qo-color-primary);
+  border: 2px solid var(--qo-color-heading);
+  color: var(--qo-color-heading);
   border-radius: var(--qo-radius);
   font-size: var(--qo-font-size-base);
   font-weight: 600;
@@ -16,4 +16,8 @@
 
 .button:active {
   background: rgba(45, 74, 39, 0.08);
+}
+
+:root[data-qo-theme="dark"] .button:active {
+  background: rgba(169, 217, 160, 0.12);
 }

@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Settings, X, Sun, Moon } from "lucide-react";
-import { useTranslation, SUPPORTED_LANGUAGES } from "../i18n";
-import { useTheme } from "../theme/ThemeProvider";
+import { useTranslation } from "../i18n/useTranslation";
+import { SUPPORTED_LANGUAGES } from "../i18n/languages";
+import { useTheme } from "../theme/useTheme";
 import styles from "./SettingsPanel.module.css";
 
 /**

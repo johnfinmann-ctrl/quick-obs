@@ -90,6 +90,60 @@ Filer:
 - `public/icons/icon-512.png` (512x512)
 - `public/icons/icon-512-maskable.png` (512x512, purpose: maskable)
 
+## Publicering til GitHub Pages
+
+Quick-Obs er klargjort til at koere som et GitHub Pages-projekt-site paa:
+
+**https://johnfinmann-ctrl.github.io/quick-obs/**
+
+Dette kraever, at repositoryet hedder praecis `quick-obs`, fordi Vite er
+bygget med `base: "/quick-obs/"` (se `vite.config.ts`), og
+`manifest.webmanifest` har `start_url`/`scope` sat til `/quick-obs/`.
+
+### Saadan publiceres den (foerste gang)
+
+1. Opret et nyt, tomt repository paa GitHub med navnet **quick-obs**
+   under kontoen `johnfinmann-ctrl` (tilfoej ikke README/.gitignore fra
+   GitHub's side - dette projekt har allerede sine egne).
+2. Fra dette projekts rodmappe:
+   ```bash
+   git init
+   git add .
+   git commit -m "Quick-Obs - Fase 1"
+   git branch -M main
+   git remote add origin https://github.com/johnfinmann-ctrl/quick-obs.git
+   git push -u origin main
+   ```
+3. Gaa til repositoryets **Settings → Pages**.
+4. Under "Build and deployment" → **Source**, vaelg **GitHub Actions**
+   (ikke "Deploy from a branch").
+5. Afvent at workflowet `.github/workflows/deploy.yml` koerer faerdigt
+   under fanen **Actions** (typisk 1-2 minutter).
+6. Aabn **https://johnfinmann-ctrl.github.io/quick-obs/**.
+
+### Ved senere aendringer
+
+Et almindeligt `git push` til `main` udloeser automatisk workflowet igen
+og genudgiver siden. Workflowet kan ogsaa koeres manuelt fra
+**Actions → Deploy Quick-Obs to GitHub Pages → Run workflow**.
+
+### Hvad workflowet goer (`.github/workflows/deploy.yml`)
+
+Henter repositoryet, installerer dependencies med `npm ci`, koerer
+`npm run build` (som inkluderer `tsc -b` foer `vite build`), uploader
+`dist/`-mappen som et Pages-artifact og deployer den med GitHub's
+officielle `actions/deploy-pages`. Bruger kun det indbyggede
+`GITHUB_TOKEN` - ingen hemmelige noegler er noedvendige eller anvendt.
+
+### Vigtigt for senere faser
+
+Fase 1 har ingen klient-side routing (kun intern komponent-state), saa
+direkte genindlaesning af `/quick-obs/` virker uden videre paa statisk
+hosting. Hvis en senere fase introducerer URL-baseret routing (fx til
+enkelte blanketter), skal der tilfoejes en `404.html`-fallback-strategi,
+for at direkte genindlaesning af dybe stier ikke giver 404 paa GitHub
+Pages. Dette er ikke noedvendigt i Fase 1 og er derfor ikke tilfoejet nu.
+
 ## Udvikling
 
 ```bash
@@ -157,3 +211,36 @@ Endelig kontrol efter rettelserne: `npx tsc -b` (0 fejl), `npm run build`
 (succes), `npm run lint` (0 fejl, 0 advarsler), manifest/ikon-kontrol,
 kontrol af eksterne runtime-kald, og kontrol af at SafetyScan
 International fortsat ikke er rørt.
+
+### Tredje runde - GitHub Pages-klargøring
+
+Projektet gav 404 på `https://johnfinmann-ctrl.github.io/quick-obs/`,
+fordi der ikke fandtes en Pages-workflow, og alle asset-/manifeststier
+var absolutte fra domænets rod (`/...`) i stedet for undermappen
+`/quick-obs/`. Rettet:
+
+- `vite.config.ts`: tilføjet `base: "/quick-obs/"`
+- `index.html`: ikon-/manifest-links ændret til `%BASE_URL%...`
+- `manifest.webmanifest`: `start_url`/`scope` → `/quick-obs/`,
+  ikonstier gjort relative (`icons/icon.svg` osv.)
+- Ny fil `.github/workflows/deploy.yml`: bygger med `npm ci` +
+  `npm run build` og deployer `dist/` med GitHub's officielle
+  `actions/configure-pages`, `actions/upload-pages-artifact`,
+  `actions/deploy-pages`. Ingen hemmelige nøgler.
+
+**Verifikation:** `npm run build` kørt med den nye base, og den
+genererede `dist/index.html` bekræftet at pege udelukkende på
+`/quick-obs/...` for JS, CSS, manifest og ikoner. Derudover blev hele
+`dist/`-mappen kopieret ind i en lokal mappestruktur, der efterligner
+GitHub Pages' undermappe-layout (`/quick-obs/...`), serveret med en
+lokal statisk server, og gennemgået med Playwright: siden loader uden
+konsol-fejl og uden mislykkede netværkskald (screenshot
+`17-github-pages-simulated.png`). Direkte genindlæsning af
+`/quick-obs/` blev testet og returnerer HTTP 200 (ingen klient-side
+routing i Fase 1, så dette er ikke et problem endnu - se note i
+"Publicering til GitHub Pages" ovenfor).
+
+Da denne samtale ikke har adgang til et forbundet GitHub-repository, er
+der ikke pushet noget - projektet leveres som
+`quick-obs-phase1-github-pages.zip` med den ovenstående
+publiceringsvejledning.

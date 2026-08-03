@@ -1,0 +1,29 @@
+.button {
+  display: flex;
+  align-items: center;
+  gap: var(--qo-space-3);
+  width: 100%;
+  min-height: var(--qo-touch-target-min);
+  padding: var(--qo-space-4) var(--qo-space-5);
+  background: var(--qo-color-primary);
+  color: var(--qo-color-text-on-dark);
+  border: none;
+  border-radius: var(--qo-radius);
+  font-size: var(--qo-font-size-lg);
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: var(--qo-shadow-elevated);
+}
+
+.button:active {
+  background: var(--qo-color-primary-dark);
+}
+
+.icon {
+  flex-shrink: 0;
+}
+
+.label {
+  flex: 1;
+}

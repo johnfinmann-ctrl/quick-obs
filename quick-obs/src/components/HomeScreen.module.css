@@ -1,0 +1,44 @@
+.container {
+  width: 100%;
+  max-width: var(--qo-max-content-width);
+  margin: 0 auto;
+  padding: var(--qo-space-5) var(--qo-space-4) var(--qo-space-7);
+  display: flex;
+  flex-direction: column;
+  gap: var(--qo-space-6);
+}
+
+.header {
+  text-align: center;
+  padding-top: var(--qo-space-4);
+}
+
+.title {
+  font-size: var(--qo-font-size-2xl);
+  font-weight: 800;
+  color: var(--qo-color-primary);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.subtitle {
+  margin: var(--qo-space-1) 0 0;
+  font-size: var(--qo-font-size-base);
+  color: var(--qo-color-text-on-light);
+  opacity: 0.85;
+}
+
+.formList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--qo-space-3);
+}
+
+/* iPad og bredere: to kolonner, men bevar fuld bredde paa hver knap for
+   store beroeringsflader og lav visuel kompleksitet */
+@media (min-width: 720px) {
+  .formList {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}

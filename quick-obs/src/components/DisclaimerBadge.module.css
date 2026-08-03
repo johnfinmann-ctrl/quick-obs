@@ -1,0 +1,33 @@
+.badge {
+  margin: 0;
+  padding: var(--qo-space-3);
+  border-radius: var(--qo-radius);
+  font-size: var(--qo-font-size-sm);
+  font-weight: 700;
+  line-height: 1.35;
+  border: 2px solid transparent;
+}
+
+.default {
+  background: rgba(45, 74, 39, 0.08);
+  color: var(--qo-color-primary-dark);
+  border-color: var(--qo-color-primary);
+}
+
+.warning {
+  background: rgba(217, 165, 20, 0.14);
+  color: #5c4400;
+  border-color: var(--qo-color-warning);
+}
+
+.panPan {
+  background: rgba(245, 124, 0, 0.12);
+  color: #7a3d00;
+  border-color: var(--qo-color-pan-pan);
+}
+
+.mayday {
+  background: rgba(211, 47, 47, 0.1);
+  color: #7a1414;
+  border-color: var(--qo-color-mayday);
+}

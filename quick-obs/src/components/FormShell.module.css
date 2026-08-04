@@ -1,0 +1,36 @@
+.container {
+  width: 100%;
+  max-width: var(--qo-max-content-width);
+  margin: 0 auto;
+  padding: var(--qo-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--qo-space-4);
+}
+
+.topRow {
+  display: flex;
+}
+
+.title {
+  font-size: var(--qo-font-size-xl);
+  font-weight: 800;
+  color: var(--qo-color-heading);
+  margin: 0;
+}
+
+.description {
+  margin: 0;
+  opacity: 0.85;
+}
+
+.placeholder {
+  margin-top: var(--qo-space-4);
+  padding: var(--qo-space-5);
+  border: 2px dashed var(--qo-color-border);
+  border-radius: var(--qo-radius);
+  text-align: center;
+  color: var(--qo-color-text-on-light);
+  opacity: 0.7;
+  font-size: var(--qo-font-size-sm);
+}

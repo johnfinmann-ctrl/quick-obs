@@ -1,0 +1,37 @@
+.badge {
+  margin: 0;
+  padding: var(--qo-space-3);
+  border-radius: var(--qo-radius);
+  font-size: var(--qo-font-size-sm);
+  font-weight: 700;
+  line-height: 1.35;
+  border: 2px solid transparent;
+}
+
+/* Baggrundene er bevidst solide pastelfarver (ikke gennemsigtige overlays
+   ovenpaa sidebaggrunden), saa maerkningen bevarer hoej kontrast i baade
+   lyst og moerkt felttema. */
+
+.default {
+  background: #e3ead9;
+  color: var(--qo-color-primary-dark);
+  border-color: var(--qo-color-primary);
+}
+
+.warning {
+  background: #f7e7b8;
+  color: #5c4400;
+  border-color: var(--qo-color-warning);
+}
+
+.panPan {
+  background: #fbdcb8;
+  color: #7a3d00;
+  border-color: var(--qo-color-pan-pan);
+}
+
+.mayday {
+  background: #f6cccc;
+  color: #7a1414;
+  border-color: var(--qo-color-mayday);
+}

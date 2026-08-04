@@ -1,0 +1,10 @@
+.banner {
+  background: var(--qo-color-warning);
+  color: #23230f;
+  font-weight: 700;
+  font-size: var(--qo-font-size-sm);
+  letter-spacing: 0.02em;
+  text-align: center;
+  padding: var(--qo-space-2) var(--qo-space-3);
+  width: 100%;
+}

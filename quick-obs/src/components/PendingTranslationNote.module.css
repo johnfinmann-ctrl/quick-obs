@@ -1,7 +1,0 @@
-.note {
-  margin: var(--qo-space-1) 0 0;
-  font-size: var(--qo-font-size-sm);
-  font-style: italic;
-  color: var(--qo-color-text-on-light);
-  opacity: 0.75;
-}

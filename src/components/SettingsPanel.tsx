@@ -1,20 +1,32 @@
 import { useState } from "react";
-import { Settings, X, Sun, Moon } from "lucide-react";
+import { Settings, X, Sun, Moon, History, ShieldCheck, PhoneCall, Radar } from "lucide-react";
 import { useTranslation } from "../i18n/useTranslation";
 import { SUPPORTED_LANGUAGES } from "../i18n/languages";
 import { useTheme } from "../theme/useTheme";
 import styles from "./SettingsPanel.module.css";
 
+interface SettingsPanelProps {
+  onOpenHistory: () => void;
+  onOpenAdmin: () => void;
+  onOpenContacts: () => void;
+  onOpenDroneSurveillance: () => void;
+}
+
 /**
  * Indstillinger tilgaengelige via et almindeligt, synligt tandhjulsikon
- * (ikke skjult gestus). Fase 1 goer sprog og tema faktisk funktionelle;
- * region, kaldesignal, backup og lagringsstatus vises som kommende
- * funktioner, der aktiveres i senere faser.
+ * (ikke skjult gestus). Sprog og tema er direkte tilgaengelige her;
+ * region, kaldesignal, backup og lagringsstatus ligger i Administration
+ * (PIN-beskyttet), som denne panel giver adgang til.
  */
-export function SettingsPanel() {
+export function SettingsPanel({ onOpenHistory, onOpenAdmin, onOpenContacts, onOpenDroneSurveillance }: SettingsPanelProps) {
   const [open, setOpen] = useState(false);
   const { t, language, setLanguage } = useTranslation();
   const { theme, toggleTheme } = useTheme();
+
+  function go(action: () => void) {
+    setOpen(false);
+    action();
+  }
 
   return (
     <>
@@ -72,13 +84,22 @@ export function SettingsPanel() {
             </section>
 
             <section className={styles.section}>
-              <h3 className={styles.sectionTitle}>Kommer i senere fase</h3>
-              <ul className={styles.upcomingList}>
-                <li>Region</li>
-                <li>Lokalt kaldesignal</li>
-                <li>Eksport af lokal backup</li>
-                <li>Lagringsstatus</li>
-              </ul>
+              <button type="button" className={styles.themeToggle} onClick={() => go(onOpenHistory)}>
+                <History aria-hidden="true" size={20} />
+                <span>{t("nav.history")}</span>
+              </button>
+              <button type="button" className={styles.themeToggle} onClick={() => go(onOpenContacts)}>
+                <PhoneCall aria-hidden="true" size={20} />
+                <span>{t("contacts.title")}</span>
+              </button>
+              <button type="button" className={styles.themeToggle} onClick={() => go(onOpenAdmin)}>
+                <ShieldCheck aria-hidden="true" size={20} />
+                <span>{t("nav.admin")}</span>
+              </button>
+              <button type="button" className={styles.themeToggle} onClick={() => go(onOpenDroneSurveillance)}>
+                <Radar aria-hidden="true" size={20} />
+                <span>{t("drone.title")}</span>
+              </button>
             </section>
           </div>
         </div>

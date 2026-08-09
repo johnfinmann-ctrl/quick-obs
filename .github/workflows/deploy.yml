@@ -1,15 +1,21 @@
 name: Deploy Quick-Obs to GitHub Pages
 
+# Koerer ved push til main/master samt manuelt via "Run workflow".
+# Ingen hemmelige noegler anvendes - kun det indbyggede GITHUB_TOKEN,
+# som Actions-runneren automatisk stiller til raadighed.
 on:
   push:
     branches: [main, master]
   workflow_dispatch:
 
+# Mindste noedvendige rettigheder til at laese repoet og deploye til Pages.
 permissions:
   contents: read
   pages: write
   id-token: write
 
+# Tillad kun én samtidig deployment; afbryd ikke en igangvaerende
+# deployment, men lad den blive faerdig foerst.
 concurrency:
   group: "pages"
   cancel-in-progress: false
@@ -36,7 +42,7 @@ jobs:
       - name: Opsaet GitHub Pages
         uses: actions/configure-pages@v5
 
-      - name: Upload build-output
+      - name: Upload build-output (dist/) som Pages-artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist

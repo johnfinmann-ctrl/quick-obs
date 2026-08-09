@@ -1,0 +1,108 @@
+.container {
+  width: 100%;
+  max-width: var(--qo-max-content-width);
+  margin: 0 auto;
+  padding: var(--qo-space-4) var(--qo-space-4) var(--qo-space-7);
+  display: flex;
+  flex-direction: column;
+  gap: var(--qo-space-5);
+}
+
+.title {
+  font-size: var(--qo-font-size-xl);
+  font-weight: 800;
+  color: var(--qo-color-heading);
+  margin: 0;
+}
+
+.warningNote {
+  background: #f7e7b8;
+  color: #5c4400;
+  border: 2px solid var(--qo-color-warning);
+  border-radius: var(--qo-radius);
+  padding: var(--qo-space-3);
+  font-weight: 600;
+  margin: 0;
+}
+
+.section {
+  border: 1px solid var(--qo-color-border);
+  border-radius: var(--qo-radius);
+  padding: var(--qo-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--qo-space-3);
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: var(--qo-font-size-lg);
+  font-weight: 700;
+  color: var(--qo-color-heading);
+}
+
+.row {
+  display: flex;
+  gap: var(--qo-space-2);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.input {
+  min-height: 48px;
+  padding: var(--qo-space-2) var(--qo-space-3);
+  border-radius: var(--qo-radius);
+  border: 2px solid var(--qo-color-border);
+  background: var(--qo-color-bg-light);
+  color: var(--qo-color-text-on-light);
+  font-family: inherit;
+}
+
+:root[data-qo-theme="dark"] .input {
+  background: #1a2417;
+  color: var(--qo-color-text-on-dark);
+}
+
+.button {
+  min-height: 48px;
+  padding: 0 var(--qo-space-4);
+  border-radius: var(--qo-radius);
+  border: 2px solid var(--qo-color-heading);
+  background: transparent;
+  color: var(--qo-color-heading);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dangerButton {
+  composes: button;
+  border-color: var(--qo-color-mayday);
+  color: var(--qo-color-mayday);
+}
+
+.contactCard {
+  border: 1px solid var(--qo-color-border);
+  border-radius: var(--qo-radius);
+  padding: var(--qo-space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--qo-space-2);
+}
+
+.progressTrack {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--qo-color-border);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--qo-color-primary);
+}
+
+.small {
+  font-size: var(--qo-font-size-sm);
+  opacity: 0.75;
+  margin: 0;
+}

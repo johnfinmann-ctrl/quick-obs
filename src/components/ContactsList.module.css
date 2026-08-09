@@ -1,0 +1,74 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--qo-space-3);
+}
+
+.card {
+  border: 2px solid var(--qo-color-border);
+  border-radius: var(--qo-radius);
+  padding: var(--qo-space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--qo-space-1);
+}
+
+.name {
+  font-weight: 700;
+  margin: 0;
+}
+
+.meta {
+  font-size: var(--qo-font-size-sm);
+  opacity: 0.75;
+  margin: 0;
+}
+
+.callButton {
+  margin-top: var(--qo-space-2);
+  min-height: var(--qo-touch-target-min);
+  padding: 0 var(--qo-space-5);
+  border-radius: var(--qo-radius);
+  border: none;
+  background: var(--qo-color-mayday);
+  color: white;
+  font-weight: 700;
+  font-size: var(--qo-font-size-lg);
+  cursor: pointer;
+  width: fit-content;
+}
+
+.confirmOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(18, 24, 17, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 60;
+  padding: var(--qo-space-4);
+}
+
+.confirmBox {
+  background: var(--qo-color-bg-light);
+  color: var(--qo-color-text-on-light);
+  border-radius: var(--qo-radius-lg);
+  padding: var(--qo-space-5);
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--qo-space-3);
+}
+
+.confirmActions {
+  display: flex;
+  gap: var(--qo-space-2);
+  justify-content: flex-end;
+}
+
+.inactiveTag {
+  display: inline-block;
+  font-size: var(--qo-font-size-sm);
+  color: var(--qo-color-mayday);
+  font-weight: 700;
+}

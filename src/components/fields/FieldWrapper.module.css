@@ -1,0 +1,89 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--qo-space-1);
+}
+
+.label {
+  font-weight: 600;
+  font-size: var(--qo-font-size-sm);
+}
+
+.required {
+  color: var(--qo-color-mayday);
+  margin-left: var(--qo-space-1);
+}
+
+.help {
+  font-size: var(--qo-font-size-sm);
+  opacity: 0.7;
+  margin: 0;
+}
+
+.input {
+  min-height: var(--qo-touch-target-min);
+  padding: var(--qo-space-3);
+  border-radius: var(--qo-radius);
+  border: 2px solid var(--qo-color-border);
+  background: var(--qo-color-bg-light);
+  color: var(--qo-color-text-on-light);
+  font-family: inherit;
+  font-size: var(--qo-font-size-base);
+  width: 100%;
+}
+
+.input:focus-visible {
+  border-color: var(--qo-color-focus);
+}
+
+textarea.input {
+  min-height: 88px;
+  resize: vertical;
+}
+
+:root[data-qo-theme="dark"] .input {
+  background: #1a2417;
+  border-color: var(--qo-color-border);
+  color: var(--qo-color-text-on-dark);
+}
+
+.radioGroup,
+.checkboxGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--qo-space-2);
+}
+
+.radioOption,
+.checkboxOption {
+  display: flex;
+  align-items: center;
+  gap: var(--qo-space-2);
+  min-height: 44px;
+}
+
+.radioOption input,
+.checkboxOption input {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+.row {
+  display: flex;
+  gap: var(--qo-space-2);
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.smallButton {
+  min-height: 44px;
+  padding: 0 var(--qo-space-3);
+  border-radius: var(--qo-radius);
+  border: 2px solid var(--qo-color-heading);
+  background: transparent;
+  color: var(--qo-color-heading);
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}

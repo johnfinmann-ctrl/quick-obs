@@ -1,0 +1,93 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--qo-space-3);
+}
+
+.buttonRow {
+  display: flex;
+  gap: var(--qo-space-2);
+  flex-wrap: wrap;
+}
+
+.captureButton {
+  min-height: var(--qo-touch-target-min);
+  padding: 0 var(--qo-space-4);
+  border-radius: var(--qo-radius);
+  border: 2px solid var(--qo-color-primary);
+  background: var(--qo-color-primary);
+  color: var(--qo-color-text-on-dark);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.secondaryButton {
+  min-height: var(--qo-touch-target-min);
+  padding: 0 var(--qo-space-4);
+  border-radius: var(--qo-radius);
+  border: 2px solid var(--qo-color-heading);
+  background: transparent;
+  color: var(--qo-color-heading);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.hiddenInput {
+  display: none;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--qo-space-2);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--qo-space-3);
+  padding: var(--qo-space-2);
+  border: 1px solid var(--qo-color-border);
+  border-radius: var(--qo-radius);
+}
+
+.thumb {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: var(--qo-radius);
+  flex-shrink: 0;
+  background: var(--qo-color-border);
+}
+
+.itemInfo {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--qo-font-size-sm);
+}
+
+.itemInfo p {
+  margin: 0;
+}
+
+.deleteButton {
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: var(--qo-radius);
+  border: 2px solid var(--qo-color-mayday);
+  color: var(--qo-color-mayday);
+  background: transparent;
+  cursor: pointer;
+}
+
+.errorText {
+  color: var(--qo-color-mayday);
+  font-size: var(--qo-font-size-sm);
+  margin: 0;
+}
+
+.statusText {
+  font-size: var(--qo-font-size-sm);
+  opacity: 0.75;
+  margin: 0;
+}

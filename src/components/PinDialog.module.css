@@ -1,0 +1,75 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(18, 24, 17, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 70;
+  padding: var(--qo-space-4);
+}
+
+.box {
+  background: var(--qo-color-bg-light);
+  color: var(--qo-color-text-on-light);
+  border-radius: var(--qo-radius-lg);
+  padding: var(--qo-space-5);
+  max-width: 340px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--qo-space-3);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--qo-font-size-lg);
+  font-weight: 800;
+  color: var(--qo-color-primary);
+}
+
+.pinInput {
+  min-height: var(--qo-touch-target-min);
+  padding: var(--qo-space-3);
+  font-size: 1.5rem;
+  letter-spacing: 0.4em;
+  text-align: center;
+  border-radius: var(--qo-radius);
+  border: 2px solid var(--qo-color-border);
+}
+
+.error {
+  color: var(--qo-color-mayday);
+  margin: 0;
+  font-size: var(--qo-font-size-sm);
+}
+
+.note {
+  margin: 0;
+  font-size: var(--qo-font-size-sm);
+  opacity: 0.75;
+}
+
+.actions {
+  display: flex;
+  gap: var(--qo-space-2);
+  justify-content: flex-end;
+}
+
+.button {
+  min-height: var(--qo-touch-target-min);
+  padding: 0 var(--qo-space-4);
+  border-radius: var(--qo-radius);
+  border: 2px solid var(--qo-color-heading);
+  background: transparent;
+  color: var(--qo-color-heading);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primaryButton {
+  composes: button;
+  background: var(--qo-color-primary);
+  color: var(--qo-color-text-on-dark);
+  border-color: var(--qo-color-primary);
+}

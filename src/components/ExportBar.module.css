@@ -1,0 +1,54 @@
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--qo-space-2);
+  margin-top: var(--qo-space-3);
+}
+
+.button {
+  min-height: var(--qo-touch-target-min);
+  padding: 0 var(--qo-space-4);
+  border-radius: var(--qo-radius);
+  border: 2px solid var(--qo-color-heading);
+  background: transparent;
+  color: var(--qo-color-heading);
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--qo-space-2);
+}
+
+.status {
+  font-size: var(--qo-font-size-sm);
+  opacity: 0.75;
+  margin: var(--qo-space-2) 0 0;
+}
+
+.confirmOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(18, 24, 17, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 60;
+  padding: var(--qo-space-4);
+}
+
+.confirmBox {
+  background: var(--qo-color-bg-light);
+  color: var(--qo-color-text-on-light);
+  border-radius: var(--qo-radius-lg);
+  padding: var(--qo-space-5);
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--qo-space-3);
+}
+
+.confirmActions {
+  display: flex;
+  gap: var(--qo-space-2);
+  justify-content: flex-end;
+}

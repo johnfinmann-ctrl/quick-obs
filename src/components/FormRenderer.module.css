@@ -1,0 +1,15 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--qo-space-4);
+  margin-bottom: var(--qo-space-5);
+}
+
+.sectionTitle {
+  font-size: var(--qo-font-size-lg);
+  font-weight: 700;
+  color: var(--qo-color-heading);
+  margin: 0;
+  padding-bottom: var(--qo-space-1);
+  border-bottom: 1px solid var(--qo-color-border);
+}

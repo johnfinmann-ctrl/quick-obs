@@ -31,6 +31,12 @@ kryptering, IndexedDB, PDF, GPS/MGRS, kamera/video, talegenkendelse,
 noedopkald, automatisk sletning, backup/import, deling eller eksterne
 API-kald. Disse tilfoejes i senere faser.
 
+## Status: Fase 2 (udfyldelige blanketter, lokal lagring, administration) - afsluttet
+
+Fase 2 goer alle fem blanketter reelt funktionelle. Se "Funktioner",
+"Begraensninger", "Databehandling", "Oversaettelsesstatus",
+"PIN-sikkerhed" og "Testresultater" nedenfor for detaljer.
+
 ## PWA-status (vigtigt - laes foer det antages, at appen er offline-klar)
 
 **Oprettet i Fase 1:**
@@ -244,3 +250,350 @@ Da denne samtale ikke har adgang til et forbundet GitHub-repository, er
 der ikke pushet noget - projektet leveres som
 `quick-obs-phase1-github-pages.zip` med den ovenstående
 publiceringsvejledning.
+
+---
+
+# Fase 2 - dokumentation
+
+## Funktioner
+
+**Fem udfyldelige blanketter** (konfigurationsstyrede - felter ligger i
+`src/config/fields/*.ts`, ikke hardkodet i UI-komponenterne):
+
+- **Meldingsblanket**: afsender/kaldesignal, modtager, hvem/hvad/hvor/
+  hvornaar/hvorledes, hensigt/vurdering, egen handling, DTG, GPS, MGRS/
+  manuelt koordinatfelt, bemaerkninger, foto/video.
+- **9-Liner**: alle ni linjer, fred/krig-toggle med variantlogik for
+  linje 6 og 9 (`showWhen` i feltkonfigurationen), koder for prioritet/
+  udstyr/sikkerhed/markering/nationalitet/CBRN i en central
+  konfigurationsfil (`src/config/nineLinerConfig.ts`), redigerbare i
+  Administration. Knap til at oprette en tilknyttet MIST-rapport efter
+  gemning. Tydelig note om, at lokale procedurer/koder har forrang.
+- **MIST**: M/I/S/T-felter, bevidsthed (AVPU), puls, vejrtraekning,
+  blodtryk, SpO2, temperatur, behandlingstidspunkt, kan kobles til en
+  eksisterende 9-Liner via en dropdown (hentet dynamisk fra historikken -
+  ikke hardkodet).
+- **Dronemelding**: rent observationsskema (dato/tid, observatoer,
+  position, sidste kendte position, retning, hoejde, fastvinget/
+  multirotor, rotorer, stoerrelse/form/farve, lys, lyd, adfaerd/
+  flyvemoenster, synlig nyttelast, afstand/retning, foto/video). Ingen
+  trusselsvurdering, vaaben- eller reaktionsforslag er tilfoejet nogen
+  steder i kode eller tekst.
+- **SAR-melding**: domaene (maritim/land/luft), MAYDAY/PAN-PAN/
+  observation, MAYDAY RELAY, alle sagsfelter, samt en redigerbar
+  MIPRE-radiotekstgenerator (M/I/P/R/E) der udfyldes fra formularens
+  felter, men altid kan rettes af brugeren foer oplaesning/kopiering.
+  Tydelig advarsel om, at udfyldelse ikke maa forsinke et nødopkald.
+
+**Faelles medie-komponent** (`MediaCapture`): tag foto/optag video eller
+vaelg eksisterende filer, lokal komprimering af billeder (canvas, ingen
+cloud/AI), filstoerrelse og status vist, videoer over 60 MB afvises med
+en tydelig fejlbesked, sletning af enkelt mediefil. Alt gemmes lokalt i
+IndexedDB - ingen upload noget sted.
+
+**Nødkontaktmodul** (`ContactsList` + `storage/contacts.ts`):
+centraliseret, administrerbart kontaktregister (ikke hardkodet i
+formular-komponenterne). Stor RING NU-knap kraever en bekraeftelsesdialog,
+foer telefonens opkaldsdialog aabnes via et almindeligt `tel:`-link -
+appen foretager aldrig selv et opkald.
+
+**Lokal lagring** (IndexedDB, `src/storage/`): versioneret skema,
+automatisk kladde pr. blankettype med debounced autosave, "fortsaet
+seneste registrering" (kladden indlaeses automatisk ved genaabning),
+historik med soegning/filtrering/aabn/duplikér/eksportér/slet (med
+bekraeftelse), haandtering af `QuotaExceededError`. Kun én blanket kan
+vaere aaben ad gangen (styret af navigationsstaten i `App.tsx`).
+
+**Deling/eksport**: kopiér ren tekst, Web Share API (med download-
+fallback), download som tekstfil, lokal PDF (jsPDF, lazy-loaded ved
+foerste brug - ingen serverkald). Tydelig bekraeftelse, foer en rapport
+med personhenfoerlige/medicinske felter deles eller downloades.
+
+**Administration** (PIN-beskyttet, `src/components/AdminPanel.tsx`):
+- Rediger noedkontakter (navn, telefon, aktiv/inaktiv)
+- Rediger den danske tekst for 9-Liner-koder (gemmes som lokale
+  overrides, har forrang over standardteksten)
+- Lokalt kaldesignal, standardregion, automatisk sletning (slaaet fra
+  som standard)
+- Lagringsstatus (`navigator.storage.estimate()`, hvor understøttet)
+- Se og slet lokale kladder
+- Eksportér/importér lokal backup (JSON - se "Databehandling")
+- Oversaettelsesstatus for KL/FO (se "Oversaettelsesstatus")
+- Skift PIN
+- Nulstil demoindhold (dobbelt bekraeftelse)
+
+## Begraensninger (bevidste, dokumenterede fravalg i Fase 2)
+
+- **9-Liner-kodeadministration** er tekst-override pr. kode, ikke en
+  fuld editor til at tilfoeje/fjerne hele kodekategorier.
+- **Backup indeholder ikke mediefiler** (foto/video) - kun tekstdata
+  (rapporter, kontakter, indstillinger). Se advarslen i Administration.
+- **MGRS er et manuelt fritekstfelt**, ikke en automatisk GPS-til-MGRS-
+  konvertering. Dette opfylder opgavens formulering ("MGRS eller manuelt
+  koordinatfelt"), men er vaerd at vaere opmaerksom paa.
+- **Automatisk sletning** (24/48/72 timer) er en indstilling i
+  Administration, men selve den baggrundskoerende sletningsjob er ikke
+  implementeret i denne fase - indstillingen gemmes, men haandhaeves
+  endnu ikke automatisk. Staar som en kendt mangel, ikke en skjult
+  paastand om, at det virker.
+- **Ingen offline service worker endnu** - se "PWA-status".
+- **Ingen fysisk enhedstest** (rigtigt kamera/GPS/tel:-opkald) er
+  udfoert - kun browser-baseret automatiseret test (Playwright) og
+  fil-baseret medie-upload-simulation. Se "Testresultater".
+
+## Databehandling
+
+Alt data forbliver lokalt paa enheden (IndexedDB + browserens
+Web Crypto/geolocation-API'er). Der er:
+
+- Ingen cloud-synkronisering
+- Ingen automatisk transmission af rapporter, fotos, video eller
+  position til nogen server
+- Ingen eksterne AI-, analyse- eller taletjenester
+- Ingen analytics eller tracking
+- PIN gemmes som en saltet SHA-256-hash (`src/storage/pin.ts`) - aldrig
+  som klartekst
+- Backup-eksport er en JSON-fil, brugeren selv downloader og opbevarer -
+  appen sender den ikke nogen steder
+
+## Oversaettelsesstatus
+
+Dansk er fuldt, autoritativt demosprog. Faste operative udtryk (MAYDAY,
+DTG, MGRS, 9-LINER, MIST, OVER, osv.) oversaettes aldrig.
+
+**Faeroesk (FO):** Der er udarbejdet et foersteudkast, der daekker
+forsiden, navigation, faelles felter, formular-titler/beskrivelser/
+maerkninger, eksport, kontakter, historik og de vigtigste administrations-
+tekster. Det daekker IKKE endnu alle detaljerede blanketfelter (fx de
+fulde 9-Liner/MIST/Dronemelding/SAR-feltnavne og 9-Liner-koderne), som
+falder tilbage til dansk med en diskret "Oversaettelse afventer
+godkendelse"-note. Markeret tydeligt i Administration under
+"Oversaettelsesstatus" (numerisk daekning i %) og maa IKKE behandles som
+en godkendt oversaettelse foer en foeroeyskt-talende fagperson har
+gennemgaaet den.
+
+**Groenlandsk/Kalaallisut (KL):** Bevidst efterladt tomt i denne fase.
+Kalaallisut er polysyntetisk og ligger sprogligt langt fra dansk, og
+risikoen for fejlagtig, vildledende maskingenereret tekst blev vurderet
+til at vaere for hoej i en app, der ogsaa daekker noed-/SAR-kommunikation
+- ogsaa selv med en tydelig udkast-markering. Alle KL-tekster falder
+derfor til dansk + den diskrete fallback-note. Dette er en bevidst
+kvalitets-/sikkerhedsafvejning, ikke en forglemmelse - se kommentaren i
+`src/i18n/kl.ts`. Anbefalet naeste skridt: udarbejd en egentlig
+Kalaallisut-oversaettelse sammen med en modersmaalstalende fagperson,
+frem for at udvide dette AI-genererede udkast yderligere.
+
+Alle steder oversaettelse mangler, vises dansk sammen med en diskret
+"Oversaettelse afventer godkendelse"-note - den raa
+`PENDING_NATIVE_TRANSLATION`-markoer vises aldrig direkte til brugeren.
+
+## PIN-sikkerhed
+
+- Demo-PIN ved foerste adgang til Administration: **1234**
+- PIN gemmes ALDRIG som klartekst - kun som en saltet SHA-256-hash
+  (Web Crypto `SubtleCrypto`, koerer lokalt i browseren)
+- PIN kan aendres i Administration
+- Administration laases automatisk igen efter 5 minutters inaktivitet
+- Tydelig tekst vist i UI'et: "Demo-PIN giver ikke militaergodkendt
+  sikkerhed" - dette er et demo-sikkerhedsniveau, IKKE en militaer- eller
+  myndighedsgodkendt loesning
+- Nulstilling af demoindhold og import af backup kraever eksplicit
+  bekraeftelse
+
+## Testresultater
+
+Testet med Playwright (automatiseret browsertest) mod et lokalt
+production-build, samt visuel gennemgang af skaermbilleder:
+
+| Test | Resultat |
+|---|---|
+| Udfyld og gem Meldingsblanket (paakraevede felter, autosave) | ✅ Bestaaet |
+| Rapport vises korrekt i Historik | ✅ Bestaaet |
+| 9-Liner: fred/krig-variantfelter, gem, opret tilknyttet MIST | ✅ Bestaaet |
+| MIST: dynamisk kobling til gemt 9-Liner forudfyldt korrekt | ✅ Bestaaet |
+| Dronemelding: rent observationsskema uden reaktionsforslag | ✅ Bestaaet (kodegennemgang + visuel kontrol) |
+| SAR: MAYDAY-valg, MIPRE-generering indeholder korrekt indhold | ✅ Bestaaet |
+| Nødkontakter: RING NU kraever bekraeftelse foer `tel:`-link | ✅ Bestaaet |
+| Sprogskift til Kalaallisut: dansk fallback + diskret note vises | ✅ Bestaaet (19 fallback-noter paa én formularside) |
+| Sprogskift til Foroyskt: forside fuldt oversat, ingen fallback | ✅ Bestaaet |
+| Moerkt felttema paa forside og formularer | ✅ Bestaaet |
+| Admin: standard-PIN 1234 laaser op, panel vises | ✅ Bestaaet |
+| Medie: foto vedhaeftet, komprimeret, vist i liste | ✅ Bestaaet |
+| iPad liggende / desktop: 9-Liner og Dronemelding, ingen vandret scrolling | ✅ Bestaaet |
+| Ingen konsol-fejl eller mislykkede netvaerkskald under hele testkoerslen | ✅ Bekraeftet (0 fejl) |
+| `npx tsc -b` | ✅ 0 fejl |
+| `npm run lint` | ✅ 0 fejl, 0 advarsler |
+| `npm run build` | ✅ Succes (jsPDF lazy-loaded, hovedbundle reduceret fra 668 KB til 269 KB) |
+| Manifest/ikonreferencer efter build | ✅ Alle peger korrekt paa `/quick-obs/...` |
+| Eksterne runtime-kald | ✅ Ingen fundet |
+| SafetyScan International | ✅ Fortsat urørt |
+
+**Ikke testet:** rigtigt enhedskamera, rigtig GPS-hardware, rigtige
+telefonopkald, og fysisk iPhone/Android/iPad-hardware (kun
+browser-emulerede viewports). Dette anbefales foer eventuel reel
+feltafproevning.
+
+---
+
+# Korrektionsrunde - "udvidet Quick-Obs-specifikation"
+
+## Status
+
+Denne runde tilfoejer: Hurtig rapport, SITREP, taleoptagelse, GPS-
+kortvisning, Blanketbibliotek, et separat droneovervaagnings-demo-
+interface, samt udvidet sprogstatus og en oversaettelseskilde-eksport.
+Alt er bygget oven paa den eksisterende, testede Fase 2 - ingen
+faerdige funktioner er overskrevet eller genopbygget.
+
+## Nye funktioner
+
+**Hurtig rapport** (`src/components/forms/HurtigRapportForm.tsx`):
+rapporttype, hvad der er sket, automatisk DTG/GPS (altid manuelt
+rettelig), observatoer, prioritet, kort bemaerkning, foto/video/
+taleoptagelse. Efter gemning tilbydes "Udvid til Meldingsblanket /
+Dronemelding / SITREP / SAR-melding" - de overlappende felter (DTG,
+GPS, observatoer, bemaerkning, medier) kopieres til en ny kladde for
+maalblanketten, saa data ikke skal tastes igen (`src/utils/expandReport.ts`).
+
+**SITREP** (`src/components/forms/SitrepForm.tsx`): fuldt felt-saet
+(rapportnummer, enhed, periode, DTG, samlet situation, haendelser,
+egne forhold, personel/materiel/logistik/kommunikation/vejr-terraen,
+ressourcebehov, forventet udvikling, planlagte handlinger,
+beslutningspunkter, bemaerkninger). Kan knytte sig til flere
+eksisterende rapporter via et dynamisk flervalg hentet fra historikken -
+eksportteksten samler automatisk de tilknyttede rapporters titel,
+position og medieantal. Gemmes/kopieres/deles/eksporteres som tekst og
+PDF via den eksisterende `ExportBar`. Maerket "DEMOFORMAT – IKKE
+OFFICIEL ELLER MYNDIGHEDSGODKENDT".
+
+**Taleoptagelse** (`src/components/fields/VoiceRecorder.tsx`, udvidet
+`MediaCapture.tsx`): start/stop via MediaRecorder API, optagelsestid
+vist live, afspilning (native `<audio controls>`), omdoebning,
+sletning, filstoerrelse, lokal lagring i IndexedDB (samme media-store
+som foto/video). Tydelig fejlbesked ved afvist mikrofontilladelse eller
+manglende browserunderstoettelse. INGEN cloud-transskription - lyden
+gemmes blot som binaerdata. Diktering til tekst sker fortsat via
+enhedens eget tastatur i tekstfelterne.
+
+**GPS og kortvisning** (`src/components/MapView.tsx`, Leaflet +
+OpenStreetMap-fliser): aktuel position, rapportens position, manuel
+placering ved tryk paa kortet, flere observationer paa samme kort
+(bruges i Droneovervaagnings-demoen), zoom, GPS-noejagtighed og
+-tidspunkt vist ved hentning, kopiér koordinat, "Åbn i kortapp" (via
+`geo:`-URI), online/offline-status, haandtering af afvist
+GPS-tilladelse. **Kan slaas fra i Administration** ("Kortvisning") -
+GPS og manuel koordinatindtastning fungerer fuldstaendigt uden kortet,
+uanset denne indstilling. Tydelig disclosure vist ved kortet: fliserne
+hentes fra en ekstern tjeneste (OpenStreetMap), men rapporttekst,
+persondata og medier sendes ALDRIG dertil - kun de zoom/koordinat-tal,
+der er noedvendige for at hente baggrundsbilledet.
+
+**Blanketbibliotek** (`src/components/FormLibraryView.tsx` +
+`src/formLibrary/`): konfigurationsstyret oversigt over alle syv
+blanketter (Hurtig rapport, Meldingsblanket, SITREP, 9-Liner, MIST,
+Dronemelding, SAR-melding) med navn, version, status (demo/udkast/
+verificeret), seneste faglige kontrol og aktiv/inaktiv. Administrator
+kan aktivere/deaktivere og saette raekkefoelge i Administration -
+aendringer slaar med det samme igennem paa forsiden.
+
+**Droneovervaagnings-demo** (`src/components/DroneSurveillanceView.tsx`,
+`src/droneSurveillance/`, adskilt fra selve Dronemelding-blanketten):
+viser altid statusteksten "Ingen aktiv sensor eller datakilde
+tilsluttet". TypeScript-typer for telemetri, Remote ID og
+sensorobservationer samt en `DroneDataProvider`-adapter-graenseflade til
+fremtidige, lovlige datakilder er defineret i `src/types/index.ts`. Kun
+en lokal, tydeligt markeret testdata-udbyder findes i denne demo
+(`localTestDataProvider.ts`). Viser testdataene paa kort og som
+tidslinje. INGEN trusselsvurdering, maalidentifikation eller
+bekaempelses-/reaktionsanvisninger forekommer noget sted i denne
+kode/tekst. Telefonens eget kamera/GPS fremstilles ingen steder som
+automatisk droneovervaagning.
+
+**Udvidet sprogstatus**: permanent banner under demobanneret, naar
+sproget ikke er dansk - "OVERSÆTTELSESUDKAST – AFVENTER KONTROL AF
+MODERSMÅLSTALENDE" paa foeroeyskt, "Kalaallisut oversættelse mangler –
+dansk tekst vises" paa kalaallisut (`LanguageStatusBanner.tsx`).
+Administration viser nu status pr. sprog (Dansk: grundsprog, Foeroeyskt:
+udkast/ikke godkendt, Kalaallisut: afventer oversaettelse), samt en ny
+"Eksportér kildetekst til oversaetter"-funktion, der downloader alle
+danske streng-ID'er som en JSON-fil klar til en modersmaalstalende
+oversaetter - uden at opfinde nogen groenlandske formuleringer paa
+forhaand (`src/i18n/exportTranslationFile.ts`).
+
+**Ny forside**: "Hurtig rapport" i fuld bredde oeverst, dernaest
+Meldingsblanket/SITREP/Dronemelding/SAR-melding, en "Medicinsk"-
+sektionslabel over 9-Liner/MIST, og til sidst Blanketbibliotek/Historik
+under en "Mere"-label. Raekkefoelgen respekterer Blanketbibliotekets
+sortering/aktiv-status. Mobil: én kolonne (uaendret). iPad/desktop: to
+kolonner.
+
+## Rapportsletning og medier
+
+`deleteReportWithMedia()` sletter nu ogsaa en rapports vedhaeftede
+foto/video/lydfiler fra IndexedDB - men kun de filer, INGEN andre
+rapporter (fx en duplikeret rapport) stadig refererer til, saa delte
+medier ikke forsvinder under en anden rapport ved en fejl.
+
+## Eksport med medier - dokumenteret adfaerd
+
+- **PDF**: indeholder pt. kun tekstindholdet (feltvaerdier, MIPRE-tekst,
+  antal vedhaeftede medier) - IKKE selve foto-billederne indlejret.
+  Dette er en kendt begraensning, ikke en skjult mangel.
+- **Video/lyd som fil**: kan ikke deles direkte via den nuvaerende
+  `ExportBar` (som deler/downloader tekst/PDF) - selve mediefilerne kan
+  afspilles/downloades enkeltvis fra medielisten i formularen via
+  browserens egne kontroller, men mangler en dedikeret "del denne fil"-
+  knap. Naevnes her som naeste skridt.
+- **Filstoerrelsesgraenser**: billeder komprimeres lokalt (maks. 1600px,
+  75% JPEG-kvalitet), video afvises over 60 MB, lyd afvises over 25 MB -
+  alle med tydelig fejlbesked.
+- **iOS Web Share-fallback**: haandteres allerede for tekst/PDF (falder
+  tilbage til download, hvis `navigator.share` mangler eller fejler) -
+  ikke specifikt testet for medie-filer, da Web Share af mediefiler
+  ikke er implementeret endnu (se ovenfor).
+- **Medier efter genindlaesning**: verificeret i test - en optaget
+  lydfil er fortsat til stede og afspilbar efter en fuld
+  sidegenindlaesning (IndexedDB er persistent).
+
+## Kendte miljoebegraensninger under test
+
+Kortfliser (OpenStreetMap) kunne ikke hentes i dette sandboxede
+build-/testmiljoe, fordi netvaerksadgangen her er begraenset til en
+allow-liste af domaener (pakkeregistre, GitHub m.v.), som ikke
+inkluderer `tile.openstreetmap.org`. Dette paavirker IKKE den
+faerdige app i en almindelig browser med normal internetadgang - og
+den indbyggede fejlhaandtering (fliseindlaesningsfejl -> tydelig
+tekstbesked, koordinater vist som tekst) blev verificeret at virke
+korrekt. Selve online/offline-detektionen, admin-deaktivering af
+kortet, GPS-haentning, permission-handling og kort-UI'et i oevrigt er
+alt sammen testet og fungerer.
+
+## Testresultater (denne runde)
+
+| Test | Resultat |
+|---|---|
+| Hurtig rapport: udfyld, gem, udvid til Meldingsblanket (data overfoert korrekt) | ✅ Bestaaet |
+| SITREP: udfyld paakraevede felter (inkl. DTG), gem, tilknyt eksisterende rapport | ✅ Bestaaet |
+| Taleoptagelse (fake mikrofon): start, timer, stop, afspilningskontrol vist | ✅ Bestaaet |
+| Mikrofontilladelse afvist: fejlbesked vist | ✅ Bestaaet (foerste testrunde) |
+| GPS godkendt: position hentet og indsat | ✅ Bestaaet |
+| Kort online: kortcontainer og disclosure vist | ✅ Bestaaet (selve OSM-fliserne ikke hentbare i dette sandboxede miljoe, se ovenfor) |
+| Kort offline: tydelig offline-besked, ingen fejl | ✅ Bestaaet |
+| Blanketbibliotek: liste vist, admin kan (de)aktivere og sortere | ✅ Bestaaet |
+| Droneovervaagnings-demo: status, testdata, kort, tidslinje | ✅ Bestaaet |
+| Medier bevaret efter sidegenindlaesning | ✅ Bestaaet |
+| Admin-PIN 1234 laaser op, "Laas nu" laaser manuelt igen | ✅ Bestaaet |
+| Dansk / Foeroeyskt / Kalaallisut fallback + statusbannere | ✅ Bestaaet |
+| Mobil, iPad stående, iPad liggende, desktop | ✅ Bestaaet |
+| Lyst og moerkt tema | ✅ Bestaaet |
+| `npx tsc -b` | ✅ 0 fejl |
+| `npm run lint` | ✅ 0 fejl, 0 advarsler |
+| `npm run build` | ✅ Succes |
+| GitHub Pages-simulering under `/quick-obs/` | ✅ Alle asset-stier korrekte |
+| Ingen konsol-fejl eller mislykkede requests (ekskl. forventede OSM-fliser) | ✅ Bekraeftet |
+
+**Fejl fundet og rettet under denne runde:** to steder brugte
+`\u00b1`/`\u00b0` direkte som JSX-tekst i stedet for i en streng -
+JSX fortolker ikke Unicode-escapes i raa tekst, saa "±" og "°" blev
+vist som bogstaveligt "\u00b1"/"\u00b0". Rettet ved at pakke tegnene i
+`{"\u00b1"}`-udtryk.

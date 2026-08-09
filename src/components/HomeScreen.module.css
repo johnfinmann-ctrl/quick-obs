@@ -34,6 +34,19 @@
   gap: var(--qo-space-3);
 }
 
+.fullWidth {
+  width: 100%;
+}
+
+.sectionLabel {
+  margin: var(--qo-space-2) 0 0;
+  font-size: var(--qo-font-size-sm);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.65;
+}
+
 /* iPad staaende og opefter: to kolonner, men bevar fuld bredde paa hver
    knap for store beroeringsflader og lav visuel kompleksitet. Den femte
    knap (ulige antal) lander alene i venstre kolonne via normal
@@ -43,6 +56,10 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--qo-space-4);
+  }
+
+  .fullWidth {
+    grid-column: 1 / -1;
   }
 }
 

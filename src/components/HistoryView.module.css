@@ -1,0 +1,85 @@
+.container {
+  width: 100%;
+  max-width: var(--qo-max-content-width);
+  margin: 0 auto;
+  padding: var(--qo-space-4) var(--qo-space-4) var(--qo-space-7);
+  display: flex;
+  flex-direction: column;
+  gap: var(--qo-space-4);
+}
+
+.title {
+  font-size: var(--qo-font-size-xl);
+  font-weight: 800;
+  color: var(--qo-color-heading);
+  margin: 0;
+}
+
+.controls {
+  display: flex;
+  gap: var(--qo-space-2);
+  flex-wrap: wrap;
+}
+
+.input {
+  min-height: 48px;
+  padding: 0 var(--qo-space-3);
+  border-radius: var(--qo-radius);
+  border: 2px solid var(--qo-color-border);
+  background: var(--qo-color-bg-light);
+  color: var(--qo-color-text-on-light);
+  flex: 1;
+  min-width: 160px;
+}
+
+:root[data-qo-theme="dark"] .input {
+  background: #1a2417;
+  color: var(--qo-color-text-on-dark);
+}
+
+.card {
+  border: 1px solid var(--qo-color-border);
+  border-radius: var(--qo-radius);
+  padding: var(--qo-space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--qo-space-2);
+}
+
+.cardTitle {
+  margin: 0;
+  font-weight: 700;
+}
+
+.meta {
+  margin: 0;
+  font-size: var(--qo-font-size-sm);
+  opacity: 0.75;
+}
+
+.actions {
+  display: flex;
+  gap: var(--qo-space-2);
+  flex-wrap: wrap;
+}
+
+.button {
+  min-height: 44px;
+  padding: 0 var(--qo-space-3);
+  border-radius: var(--qo-radius);
+  border: 2px solid var(--qo-color-heading);
+  background: transparent;
+  color: var(--qo-color-heading);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dangerButton {
+  composes: button;
+  border-color: var(--qo-color-mayday);
+  color: var(--qo-color-mayday);
+}
+
+.empty {
+  opacity: 0.7;
+}

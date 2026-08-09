@@ -1,0 +1,45 @@
+.container {
+  width: 100%;
+  max-width: var(--qo-max-content-width);
+  margin: 0 auto;
+  padding: 16px 16px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.title {
+  color: var(--qo-color-heading);
+  margin: 0;
+}
+
+.statusBanner {
+  padding: 12px;
+  border-radius: 12px;
+  background: #f6cccc;
+  color: #7a1414;
+  font-weight: 700;
+  margin: 0;
+}
+
+.testDataBanner {
+  padding: 12px;
+  border-radius: 12px;
+  background: #f7e7b8;
+  color: #5c4400;
+  font-weight: 700;
+  margin: 0;
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.timelineItem {
+  border: 1px solid var(--qo-color-border);
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 0.9rem;
+}

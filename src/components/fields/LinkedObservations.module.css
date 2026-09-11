@@ -1,0 +1,64 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.entry {
+  border: 1px solid var(--qo-color-border);
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--qo-color-bg-light);
+}
+
+:root[data-qo-theme="dark"] .entry {
+  background: #1a2417;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.input {
+  min-height: 44px;
+  padding: 8px;
+  border-radius: 8px;
+  border: 2px solid var(--qo-color-border);
+  background: var(--qo-color-bg-light);
+  color: var(--qo-color-text-on-light);
+  font-family: inherit;
+  flex: 1;
+  min-width: 120px;
+}
+
+:root[data-qo-theme="dark"] .input {
+  background: #1a2417;
+  color: var(--qo-color-text-on-dark);
+}
+
+.addButton {
+  min-height: 48px;
+  padding: 0 16px;
+  border-radius: 10px;
+  border: 2px solid var(--qo-color-heading);
+  background: transparent;
+  color: var(--qo-color-heading);
+  font-weight: 600;
+  cursor: pointer;
+  width: fit-content;
+}
+
+.deleteButton {
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 8px;
+  border: 2px solid var(--qo-color-mayday);
+  color: var(--qo-color-mayday);
+  background: transparent;
+  cursor: pointer;
+}

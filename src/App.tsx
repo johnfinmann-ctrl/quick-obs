@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LanguageProvider } from "./i18n/LanguageProvider";
 import { ThemeProvider } from "./theme/ThemeProvider";
 import { OptionOverridesProvider } from "./optionOverrides/OptionOverridesContext";
 import { FormLibraryProvider } from "./formLibrary/FormLibraryProvider";
 import { DemoBanner } from "./components/DemoBanner";
 import { LanguageStatusBanner } from "./components/LanguageStatusBanner";
+import { UpdatePrompt } from "./components/UpdatePrompt";
 import { SettingsPanel } from "./components/SettingsPanel";
 import { HomeScreen } from "./components/HomeScreen";
 import { HurtigRapportForm } from "./components/forms/HurtigRapportForm";
@@ -19,12 +20,23 @@ import { AdminPanel } from "./components/AdminPanel";
 import { ContactsView } from "./components/ContactsView";
 import { FormLibraryView } from "./components/FormLibraryView";
 import { DroneSurveillanceView } from "./components/DroneSurveillanceView";
+import { DroneIncidentView } from "./components/DroneIncidentView";
 import { openReportAsDraft } from "./storage/drafts";
+import { loadSettings } from "./storage/settings";
 import type { AppView, FormKind } from "./types";
 import styles from "./App.module.css";
 
 function AppContent() {
   const [view, setView] = useState<AppView>("home");
+  const [incidentId, setIncidentId] = useState<string | null>(null);
+
+  useEffect(() => {
+    loadSettings().then((s) => {
+      if (s.startModule && s.startModule !== "home") {
+        setView(s.startModule as AppView);
+      }
+    });
+  }, []);
 
   const handleSelectForm = (kind: FormKind) => setView(kind);
   const handleBack = () => setView("home");
@@ -69,7 +81,16 @@ function AppContent() {
       content = <MistForm onBack={handleBack} />;
       break;
     case "dronemelding":
-      content = <DronemeldingForm onBack={handleBack} />;
+      content = (
+        <DronemeldingForm
+          onBack={handleBack}
+          onViewIncident={(id) => {
+            setIncidentId(id);
+            setView("drone-incident");
+          }}
+          onNavigateToSitrep={() => setView("sitrep")}
+        />
+      );
       break;
     case "sar-melding":
       content = <SarMeldingForm onBack={handleBack} />;
@@ -88,6 +109,17 @@ function AppContent() {
       break;
     case "drone-surveillance":
       content = <DroneSurveillanceView onBack={handleBack} />;
+      break;
+    case "drone-incident":
+      content = incidentId ? (
+        <DroneIncidentView incidentId={incidentId} onBack={handleBack} />
+      ) : (
+        <HomeScreen
+          onSelectForm={handleSelectForm}
+          onOpenFormLibrary={() => setView("form-library")}
+          onOpenHistory={() => setView("history")}
+        />
+      );
       break;
     default:
       content = (
@@ -112,6 +144,7 @@ function AppContent() {
         />
       </div>
       <main className={styles.main}>{content}</main>
+      <UpdatePrompt />
     </div>
   );
 }

@@ -1,0 +1,43 @@
+.details {
+  border: 1px solid var(--qo-color-border);
+  border-radius: 12px;
+  background: #eef3ea;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+
+:root[data-qo-theme="dark"] .details {
+  background: #17211a;
+  border-color: #2c3a27;
+}
+
+.summary {
+  cursor: pointer;
+  font-weight: 700;
+  list-style: none;
+  color: var(--qo-color-heading);
+}
+
+.summary::-webkit-details-marker {
+  display: none;
+}
+
+.summary::before {
+  content: "\25B8 ";
+}
+
+details[open] > .summary::before {
+  content: "\25BE ";
+}
+
+.text {
+  margin: 8px 0 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.note {
+  margin: 6px 0 0;
+  font-size: 0.75rem;
+  opacity: 0.65;
+}

@@ -12,6 +12,9 @@ export const DEFAULT_SETTINGS: AppSettings = {
   pinSalt: null,
   autoDeleteHours: 0,
   mapEnabled: true,
+  startModule: "home",
+  timeZoneMode: "auto",
+  manualTimeZone: null,
 };
 
 export async function loadSettings(): Promise<AppSettings> {

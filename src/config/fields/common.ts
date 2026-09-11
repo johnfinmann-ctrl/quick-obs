@@ -30,6 +30,12 @@ export const coordinatesField: FieldDefinition = {
   helpId: "fields.common.coordinatesHelp",
 };
 
+export const mgrsField: FieldDefinition = {
+  id: "mgrs",
+  labelId: "fields.common.mgrs",
+  type: "mgrs",
+};
+
 export const remarksField: FieldDefinition = {
   id: "remarks",
   labelId: "fields.common.remarks",

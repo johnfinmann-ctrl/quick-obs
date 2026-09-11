@@ -39,21 +39,24 @@ Fase 2 goer alle fem blanketter reelt funktionelle. Se "Funktioner",
 
 ## PWA-status (vigtigt - laes foer det antages, at appen er offline-klar)
 
+**⚠️ Historisk afsnit fra Fase 1 - se "PWA - teknisk oversigt" i
+Fase 2.1-afsnittet nedenfor for den AKTUELLE, korrekte status.** Fra og
+med Fase 2.1's rettelsesrunde HAR Quick-Obs en fungerende, testet
+service worker og fungerer offline. Nedenstaaende beskriver kun, hvad
+der var sandt paa daetidspunktet i Fase 1, og er bevaret som historisk
+dokumentation af projektets udvikling.
+
 **Oprettet i Fase 1:**
 - `manifest.webmanifest` med navn, farver, sprog og ikonreferencer
 - SVG- og PNG-ikoner (192, 512, 512 maskable, 180 apple-touch-icon)
 - `<link rel="manifest">`, `<link rel="apple-touch-icon">` m.v. i
   `index.html`
 
-**IKKE oprettet eller verificeret endnu:**
-- Ingen service worker er registreret
+**IKKE oprettet eller verificeret i Fase 1 (rettet i Fase 2.1 - se nedenfor):**
+- Ingen service worker var registreret
 - Ingen offline app-shell-caching
-- Appen kan **ikke** bruges offline i den nuvaerende fase
-- "Installer app"-adfaerd i browseren er ikke testet paa fysisk enhed
-
-Fuld offline-PWA (service worker, cache-strategi, app-shell) er planlagt
-til Fase 7 og maa foerst beskrives som "offline-klar", naar det er
-implementeret og verificeret der.
+- Appen kunne **ikke** bruges offline i Fase 1
+- "Installer app"-adfaerd i browseren er fortsat ikke testet paa fysisk enhed
 
 ## Layout - responsivt fra mobil til desktop
 
@@ -336,7 +339,9 @@ med personhenfoerlige/medicinske felter deles eller downloades.
   implementeret i denne fase - indstillingen gemmes, men haandhaeves
   endnu ikke automatisk. Staar som en kendt mangel, ikke en skjult
   paastand om, at det virker.
-- **Ingen offline service worker endnu** - se "PWA-status".
+- **Service worker/offline**: var en aaben mangel paa dette tidspunkt i
+  projektet - siden rettet og verificeret i Fase 2.1, se "PWA - teknisk
+  oversigt" i Fase 2.1-afsnittet.
 - **Ingen fysisk enhedstest** (rigtigt kamera/GPS/tel:-opkald) er
   udfoert - kun browser-baseret automatiseret test (Playwright) og
   fil-baseret medie-upload-simulation. Se "Testresultater".
@@ -597,3 +602,401 @@ alt sammen testet og fungerer.
 JSX fortolker ikke Unicode-escapes i raa tekst, saa "±" og "°" blev
 vist som bogstaveligt "\u00b1"/"\u00b0". Rettet ved at pakke tegnene i
 `{"\u00b1"}`-udtryk.
+
+---
+
+# Fase 2.1 - udvidelse og designkorrektion
+
+## Status
+
+Denne runde bevarer alle funktioner fra den forrige leverance (Hurtig
+rapport, Meldingsblanket, SITREP, 9-Liner, MIST, Dronemelding,
+Droneovervaagnings-demo, SAR, Blanketbibliotek, Historik, foto/video/
+tale, GPS/kort, IndexedDB, eksport/deling, PIN-admin, GitHub Pages,
+Vite-base `/quick-obs/`) og tilfoejer medie-foerst-flow, video med lyd,
+korrekt tid/tidszone-haandtering, udvidet medie-metadata, et
+modulfarve-/administrationssystem, IndexedDB-migration, et forbedret
+sprog-/oversaettelsessystem - samt, i denne rettelsesrunde: en reelt
+fungerende, testet offline-PWA, en gennemfoert kortdesign-omlaegning af
+alle undersider, og en reproducerbar Playwright-testsuite, der koerer
+efter `npm ci`.
+
+## Rettelser i denne runde (svar paa gennemgangens 6 punkter)
+
+### 1. Design (punkt 12-13) - nu fuldt gennemfoert
+
+Alle undersider bruger nu et sammenhaengende kortdesign: formular-
+sektioner (`FormRenderer`), demomaerknings-badges, det faelles
+mediekort ("Dokumentér haendelsen"), nødkontakt-/historik-/
+Blanketbiblioteks-kort og samtlige administrationssektioner er alle
+afrundede kort (`--qo-radius-lg`) med en diskret skygge og egen
+kortbaggrund, der adskiller sig fra sidebaggrunden i baade lyst og
+moerkt tema. Formularernes lodrette rytme er gjort mere kompakt
+(reduceret afstand mellem felter/sektioner). Dette er IKKE laengere en
+delvis eller udestaaende opgave - verificeret visuelt paa mobil, iPad
+(staaende/liggende) og desktop, i begge temaer (se screenshots
+`2c-03` til `2c-09`).
+
+### 2. PWA-status - afklaret og korrekt implementeret
+
+Quick-Obs har nu en reel service worker (`vite-plugin-pwa`,
+`generateSW`-strategi): hele app-shell'et (JS, CSS, HTML, manifest,
+ikoner) precaches ved foerste besoeg, og en SPA-navigations-fallback
+(`navigateFallback`) sikrer, at appen kan aabnes og navigeres helt uden
+netforbindelse. Opdatering er KONTROLLERET, ikke automatisk: naar en ny
+version er cachet i baggrunden, vises en tydelig prompt
+("Ny version af Quick-Obs er klar" / "Opdater nu" / "Senere") i stedet
+for en uventet genindlaesning, som kunne slette en igangvaerende
+udfyldelse i felten. Dette er verificeret med automatiserede tests
+(`tests/pwa-offline.spec.ts`): service workeren naar "activated",
+appen genindlaeses og navigerer korrekt med netvaerket helt slukket
+(`context.setOffline(true)`), og manifestet kan hentes offline. Der er
+ogsaa taget skaermbilleder af appen koerende offline
+(`2c-01-offline-home.png`, `2c-02-offline-form.png` - se
+`screenshots/`-mappen i tidligere leverancer for referencer; denne
+rettelsesrunde bekraefter tilstanden paa ny via de automatiserede
+tests fremfor at gentage identiske billeder).
+
+**Vigtigt forbehold:** Fordi Workbox' `generateSW` bygger en fast
+precache-liste paa build-tidspunktet, virker Kortets eksterne
+OpenStreetMap-fliser (som er en tredjeparts-nettjeneste, se afsnittet
+om kort) fortsat KUN, naar enheden er online - det er forventet og
+korrekt: selve app-shell'et (siderne, formularerne, lokal lagring) er
+offline-klar, men et kort med levende, eksterne baggrundsfliser kan af
+princip ikke vaere det.
+
+### 3-4. Playwright som devDependency + reproducerbar testkoersel
+
+`@playwright/test` er tilfoejet som `devDependency` (praecist pinnet
+til version `1.56.0` - se begrundelse nedenfor), med en
+`playwright.config.ts`, der selv bygger appen og starter en lokal
+preview-server (`webServer`), saa testene kan koeres uden manuel
+opsaetning. Alle testfiler ligger i `tests/` og bruger udelukkende
+pakker, der staar i `package.json`.
+
+**Verificeret fra en helt ren tilstand i denne rettelsesrunde:**
+
+```bash
+rm -rf node_modules dist package-lock.json
+npm install          # genererer et nyt, korrekt package-lock.json
+rm -rf node_modules
+npm ci                # den reelle, reproducerbare installation
+npx tsc -b             # 0 fejl
+npm run lint           # 0 fejl, 0 advarsler
+npm run build           # succes, inkl. service worker
+npx playwright install chromium --with-deps   # foerste gang (se note)
+npx playwright test      # 28/28 bestaaet
+```
+
+**Aerlig note om browser-binarer:** `npm ci` installerer IKKE selve
+Playwright-browserne (det er almindelig Playwright-adfaerd, ikke en
+mangel i dette projekt) - det kraever et separat
+`npx playwright install chromium` (eller `npm run playwright:install`,
+tilfoejet som et script). `@playwright/test` er bevidst pinnet til en
+PRAECIS version (`1.56.0`, ikke `^1.56.0`) i `package.json`, fordi en
+caret-range under test viste sig at lade `npm install` opgradere til en
+nyere Playwright-version, som forventede en anden Chromium-revision end
+den, der var installeret i test-miljoet her - et konkret eksempel paa
+netop den slags reproducerbarhedsproblem, denne rettelsesrunde skal
+loese. Med en praecis version undgaas denne drift mellem
+`package.json`, lockfile og installerede browser-binarer.
+
+### 5. README/kontrolrapport
+
+Dette dokument er gennemgaaet, saa det kun beskriver funktionalitet,
+der er reelt gennemfoert OG reproducerbart testet i denne
+rettelsesrunde (se "Testresultater" nedenfor for den fulde,
+maskinverificerede liste - 28/28 automatiserede tests, koert fra en
+reel `npm ci`).
+
+### 6. Levering
+
+Pakket som `quick-obs-phase2-1-corrected.zip`. Intet er uploadet eller
+pushet til GitHub.
+
+## Testresultater (denne rettelsesrunde, fra ren `npm ci`)
+
+| Testfil | Antal tests | Resultat |
+|---|---|---|
+| `tests/regression.spec.ts` | 10 | ✅ Alle bestaaet |
+| `tests/media.spec.ts` | 4 | ✅ Alle bestaaet |
+| `tests/admin-and-i18n.spec.ts` | 10 | ✅ Alle bestaaet |
+| `tests/migration.spec.ts` | 1 | ✅ Bestaaet |
+| `tests/pwa-offline.spec.ts` | 3 | ✅ Alle bestaaet |
+| **I alt** | **28** | **✅ 28/28 bestaaet** |
+
+| Oevrig kontrol | Resultat |
+|---|---|
+| `npm ci` fra ren tilstand | ✅ Succes |
+| `npx tsc -b` | ✅ 0 fejl |
+| `npm run lint` | ✅ 0 fejl, 0 advarsler |
+| `npm run build` | ✅ Succes, inkl. `dist/sw.js` |
+| Service worker naar "activated" | ✅ Verificeret automatiseret |
+| Appen fungerer 100% offline (netvaerk slukket i test) | ✅ Verificeret automatiseret + screenshot |
+| GitHub Pages-simulering under `/quick-obs/` | ✅ Alle asset-stier korrekte |
+| SafetyScan International | ✅ Fortsat urørt |
+
+## Kendte, aerligt dokumenterede begraensninger
+
+- **Kortfliser (OpenStreetMap)** kraever internetforbindelse (forventet
+  og korrekt for en ekstern kortleverandoer) - selve fejlhaandteringen
+  (offline/fliesfejl -> tydelig tekstbesked, ingen blokering af
+  rapporten) er verificeret, men de faktiske fliser er ikke hentbare i
+  dette netvaerksbegraensede sandbox-udviklingsmiljoe.
+- **Playwright-browserbinarer** downloades ikke af `npm ci` og skal
+  installeres separat (`npx playwright install chromium`) - standard
+  Playwright-adfaerd, dokumenteret ovenfor.
+- **Kalaallisut** har fortsat ingen indbygget, kompileret oversaettelse
+  (se begrundelse i `src/i18n/kl.ts`) - kun infrastruktur til at
+  importere en fremtidig, faktisk oversaettelse fra en
+  modersmaalstalende via Administration.
+- **PDF-billedindlejring** fungerer, men er ikke finjusteret til meget
+  store billedantal (grundlaeggende sideombrydning, ikke optimeret
+  layout).
+- Video/lyd kan ikke indlejres i PDF eller tekst-eksport - de deles som
+  separate filer (Web Share API med download-fallback).
+
+## PWA - teknisk oversigt
+
+- **Plugin:** `vite-plugin-pwa` (`generateSW`-strategi, Workbox)
+- **Precache:** app-shell (HTML, JS, CSS, manifest, ikoner) - 16-17
+  filer, ca. 1,3 MB, genereret ved hver `npm run build`
+- **Navigation offline:** `navigateFallback` peger paa
+  `/quick-obs/index.html`, saa SPA-routing (som udelukkende er
+  klient-side state, ikke URL-baseret i denne fase) virker uden
+  netvaerk
+- **Opdatering:** `registerType: 'prompt'` + `virtual:pwa-register/react`
+  (`src/components/UpdatePrompt.tsx`) - brugeren skal selv bekraefte en
+  opdatering; service workeren tjekker for nye versioner hver time, saa
+  laenge en fane er aaben
+- **Ikke cachet:** dynamisk data (IndexedDB-indhold, GPS, kortfliser) -
+  kun de statiske filer, der udgoer selve applikationen
+
+---
+
+# Fase 2.2 - Drone-Obs: Hurtig/Grundig observation, MGRS, OPSEC
+
+## Status
+
+Denne runde bevarer ALLE eksisterende funktioner og moduler (Hurtig
+rapport, Meldingsblanket, SITREP, 9-Liner, MIST, Dronemelding,
+Droneovervaagnings-demo, SAR, Blanketbibliotek, Historik, fælles
+mediekomponent, GPS/kort, IndexedDB, eksport/deling, moduladministration,
+sprogadministration, PIN-admin, lyst/moerkt tema, PWA/offline app-shell,
+GitHub Pages-base `/quick-obs/`) og udvider Drone-Obs betydeligt. Kapitel
+12 i den vedlagte faglige kravspecifikation er IKKE brugt som
+implementeringsinstruktion (jf. opgavens egen praecisering) - det
+eksisterende modul-dashboard og de eksisterende modulfarver fra Fase 2.1
+er bevaret uaendret.
+
+## Nye funktioner
+
+### MGRS-konvertering (`src/utils/mgrs.ts`)
+
+Lokal WGS84 <-> MGRS-konvertering, INGEN eksternt API. Testet mod to
+offentligt kendte referencevaerdier (fundet via websoegning, kildehenvisning
+i koden): én matcher til meteren, én afviger 1 meter i easting (dokumenteret
+som en kendt, ubetydelig praecisionsafvigelse - se kommentarer i
+`src/utils/mgrs.ts`). Breddegrader/laengdegrad bevares uaendret ved siden af.
+GPS-noejagtighed vises. Manuel indtastning er altid mulig. Kortfejl blokerer
+aldrig registreringen. **Ikke militaert verificeret** - kraever faglig
+kontrol foer operativ brug, jf. Fase 2.2 punkt 13. Kendt begraensning: de
+saerlige norske/Svalbard-zonebredde-undtagelser (56-84 grader N) er ikke
+implementeret.
+
+### Drone-Obs: Hurtig og Grundig observation
+
+To visninger af SAMME modul og datamodel (ikke to separate apps eller
+dublerede moduler - `src/components/forms/DronemeldingForm.tsx`):
+
+- **Hurtig observation**: medie-foerst (foto/video med lyd/tale/vaelg
+  eksisterende), automatisk GPS/DTG, én enkel observationstype, kort
+  bemaerkning. Medieoptagelse afventer IKKE udfyldte formularfelter. Kan
+  gemmes med meget faa oplysninger.
+- **Grundig observation**: alle eksisterende dronefelter plus udvidede
+  felter (se nedenfor), organiseret i sammenklappelige sektioner
+  (native `<details>`/`<summary>` - alle sektioner paa tvaers af HELE
+  appen fik denne evne som en sideeffekt, standard aabne, saa intet
+  eksisterende brydes).
+- **"Fortsaet som grundig observation"**: efter en hurtig observation er
+  gemt, genindlaeses den SAMME rapport som kladde med
+  `observationMode` sat til "grundig" - allerede registrerede
+  medier/GPS/tid/felter foelger automatisk med (ingen ny indtastning).
+
+**Fejl fundet og rettet undervejs:** efter gemning nulstilles kladden
+(designmoenster, der allerede gjaldt for alle andre blanketter) - dette
+fik foerste implementering til fejlagtigt at vise mode-vaelgeren igen i
+stedet for "gemt"-handlingerne. Rettet ved at lade den gemte rapports
+egen `observationMode` afgoere visningen efter gemning.
+
+### Udvidede Drone-Obs-felter (kun Grundig)
+
+- **Selve dronen**: antal, kendt/ukendt/usikker type, klasse (fastvinget/
+  multirotor/VTOL/ukendt/kan ikke vurderes), stoerrelse, farve/maerker,
+  lys, lyd, hoejde, hastighed, nyttelast, kamera/gimbal, antenner/RF,
+  dropmekanisme, sidst observerede retning. Alle med "Ukendt"/"Kan ikke
+  vurderes" som gyldige svar - brugeren tvinges aldrig til at gaette.
+- **Flyvemoenster**: 9 moenstre (direkte overflyvning, stationaer hover,
+  kredser, gentager rute, foelger, skifter positioner, landet/forsvundet,
+  mulig relaeposition, andet) + start-/sluttidspunkt eller fortsat
+  aktivitet.
+- **Mulige netvaerks-/relaeindikatorer**: 14 valgmuligheder (flere droner
+  samtidigt, gentagne positioner, mulig forbindelse til koeretoej/
+  bygning/mast, muligt start-/relaested, "ingen indikator", "ukendt")
+  plus fritekstnote. Alle formuleret som observationer/muligheder -
+  appen konkluderer ALDRIG selv, at der findes et netvaerk eller
+  kontrolpunkt.
+- **Kommunikation og elektroniske forstyrrelser**: type (mobil-/radio-
+  udfald, GPS-unoejagtighed/spring/utilgaengelig, kompasfejl m.v.),
+  tidspunkt, varighed, position, beroert udstyr, og tidsmaessig
+  sammenhaeng (foer/under/efter observationen). Appen fastslaar ALDRIG
+  automatisk, at en teknisk fejl skyldes dronen eller elektronisk
+  krigsfoering.
+- **Mulige tilknyttede observationer** (`src/components/fields/LinkedObservations.tsx`):
+  repeterbar liste (personer, koeretoejer, antenner, master, mulige
+  start-/landings-/relaesteder m.v.) med beskrivelse, position, retning/
+  afstand, tidspunkt og note. Skelner eksplicit mellem direkte
+  observeret, oplyst af anden person, mulig sammenhaeng og ukendt.
+  **Kendt begraensning**: hver tilknyttet observation har i denne fase
+  ikke sin egen mediekomponent (kun tekstfelter) - foto/video/lyd for
+  hovedobservationen dækkes af det faelles mediekort.
+
+### Militaerfaglig introduktion
+
+Kort, sammenklappelig tekst oeverst i Drone-Obs
+(`src/components/DroneMilitaryIntro.tsx`), tydeligt mærket som praktisk
+vejledning - IKKE en officiel myndighedsinstruks.
+
+### Flere observationer, haendelsesoversigt
+
+Naar en Grundig observation gemmes foerste gang, faar den automatisk et
+haendelses-ID. "Tilfoej endnu en observation til denne haendelse" opretter
+en ny, tilknyttet kladde. "Se haendelsesoversigt"
+(`src/components/DroneIncidentView.tsx`) viser alle observationer i
+haendelsen paa kort og som tidslinje - rene dokumentationsvaerktoejer,
+der IKKE automatisk beregner en fjendtlig hensigt eller sikker
+identifikation.
+
+### Overfoersel til SITREP
+
+En gemt Drone-Obs-observation kan overfoeres til en ny SITREP-kladdes
+"Vaesentlige haendelser"-felt (`src/utils/droneToSitrep.ts`), med
+haendelses-ID, lokal tid/UTC/tidszone/DTG, position, antal droner,
+flyvemoenster og en eksplicit note om, at INGEN automatisk
+trusselsklassifikation er foretaget.
+
+### "Vis til oplaesning" (radiovisning)
+
+`src/components/RadioDisplayView.tsx`: stor, letlaeselig visning af DTG
+og position foerst, dernaest de oevrige vigtigste oplysninger. Understoetter
+lyst, moerkt og hoejkontrast-layout. Aendrer ALDRIG de registrerede data -
+rent visningslag. Fungerer fuldt offline (kun lokale data, ingen
+netvaerkskald).
+
+### OPSEC og databeskyttelse
+
+Advarslen foer deling/eksport (`ExportBar`) er udvidet til eksplicit at
+naevne: operative oplysninger, positioner, personfoelsomme oplysninger,
+patientoplysninger, metadata i medier og modtager/delingskanal - og
+udloeses nu ogsaa af registreret position eller vedhaeftede medier (ikke
+kun personhenfoerlige feltnavne som tidligere). Ingen Google Analytics,
+Firebase, Sentry, ekstern AI-analyse, automatisk billedgenkendelse,
+automatisk taleupload/-transskription eller automatisk deling af GPS/
+medier er tilfoejet noget sted i kodebasen.
+
+**EXIF/metadata - vigtig, aerlig praecisering:** Quick-Obs' EGNE
+metadata (UTC, lokal tid, tidszone, DTG, GPS, mikrofonstatus,
+optaget/importeret, manuel rettelse) gemmes fortsat separat i
+IndexedDB og fjernes ALDRIG. Hvad angaar EXIF i selve billedfilen:
+alle fotos (baade optagede OG importerede) genkodes i oejeblikket via
+canvas ved lagring (til lokal komprimering) - dette fjerner som
+bivirkning EXIF-data fra billedfilen med det samme, ikke kun paa en
+senere eksporteret kopi. Dette er et **strengere** privatlivsvalg end
+kravets minimum (som kun kraevede fjernelse ved eksport), men betyder
+omvendt, at appen ikke internt bevarer originalens EXIF, selv til eget
+brug. Dette er en bevidst, dokumenteret afvejning - IKKE en fejl - men
+naevnes her aerligt, fordi det afviger fra en bogstavelig laesning af
+kravet.
+
+Diktering til tekst er fortsat beskrevet som en enheds-/browserfunktion
+(brugerens eget tastatur) - Quick-Obs lover intet om, at dette virker
+offline, og integrerer ikke Web Speech API eller anden cloud-baseret
+tale-til-tekst.
+
+### Faglig status ("Kraever faglig kontrol")
+
+Foelgende har fortsat udtrykkelige demomaerkninger/kilde-forbehold, der
+funktionelt svarer til "Kraever faglig kontrol", og maa IKKE
+praesenteres som officielt godkendt uden en konkret, efterproevelig
+kilde (dokumenttitel, version, afsnit):
+
+| Omraade | Nuvaerende maerkning i appen |
+|---|---|
+| 9-Liner-koder | "DEMOFORMAT BASERET PAA OFFENTLIGT TCCC-MATERIALE - KRAEVER GODKENDELSE FRA FORSVARET" |
+| Dronemelding/Drone-Obs | "IKKE VERIFICERET FORMAT - KRAEVER GODKENDELSE FRA FORSVARET/ARKTISK KOMMANDO" |
+| MGRS-konvertering | "Testet mod offentligt kendte referencevaerdier - ikke militaert verificeret uden faglig godkendelse" (vist direkte ved feltet) |
+| Noedkontakter | Kilde og "senest verificeret"-dato vist pr. kontakt (Administration) |
+| Groenlandske/faeroeyske oversaettelser | Se sprogstatusbanner og Administration -> Oversaettelsesstatus |
+| Meldingsblanket, MIST | "DEMOFORMAT - KRAEVER FAGLIG BEKRAEFTELSE" / "MAA IKKE ANVENDES TIL DIAGNOSE ELLER BEHANDLINGSBESLUTNING" |
+
+## Kendte begraensninger (Fase 2.2)
+
+- MGRS: Norge/Svalbard-zonebredde-undtagelser ikke implementeret; 1
+  meters afvigelse paa én af to testede referencevaerdier.
+- Tilknyttede observationer (i Drone-Obs) har ikke deres egen
+  mediekomponent i denne fase.
+- EXIF fjernes ved lagring (ikke kun ved eksport) - se aerlig
+  praecisering ovenfor.
+- Haendelsesoversigtens kort er underlagt samme OpenStreetMap-
+  online-krav som resten af appens kortvisning.
+- Radiovisningens "Tilbage"-knap kan i sjaeldne tilfaelde ogsaa matches
+  af en skjult, bagvedliggende knap i tilgaengelighedstraeet (ikke
+  synligt/klikbart for seende brugere, da radiovisningen daekker hele
+  skaermen) - en mindre finpudsning for skaermlaesere er ikke lavet i
+  denne fase.
+- Ingen af de nye funktioner er testet paa fysisk enhed (kun
+  automatiseret browsertest med "fake" kamera/mikrofon/GPS).
+
+## Testresultater (Fase 2.2)
+
+Fuld testsuite koert fra samme rene installation som i tidligere faser:
+
+| Testfil | Antal tests | Resultat |
+|---|---|---|
+| `tests/regression.spec.ts` (opdateret for ny Drone-Obs-flow) | 10 | ✅ Alle bestaaet |
+| `tests/media.spec.ts` | 4 | ✅ Alle bestaaet |
+| `tests/admin-and-i18n.spec.ts` | 10 | ✅ Alle bestaaet |
+| `tests/migration.spec.ts` | 1 | ✅ Bestaaet |
+| `tests/pwa-offline.spec.ts` | 3 | ✅ Alle bestaaet |
+| `tests/mgrs.spec.ts` (ny) | 5 | ✅ Alle bestaaet |
+| `tests/drone-obs.spec.ts` (ny) | 8 | ✅ Alle bestaaet |
+| **I alt** | **41** | **✅ 41/41 bestaaet** |
+
+| Oevrig kontrol | Resultat |
+|---|---|
+| `npx tsc -b` | ✅ 0 fejl |
+| `npm run lint` | ✅ 0 fejl, 0 advarsler |
+| `npm run build` (inkl. service worker) | ✅ Succes |
+| GitHub Pages-simulering under `/quick-obs/` | ✅ Alle asset-stier korrekte |
+| Regression af alle eksisterende moduler | ✅ Ingen brud |
+
+**Fejl fundet og rettet under denne rundes test:** Post-save-navigations-
+fejl i Drone-Obs (se ovenfor) - fundet af den automatiserede test, ikke
+ved manuel gennemgang, hvilket bekraefter vaerdien af den byggede
+testsuite.
+
+## Datamigration (Fase 2.2)
+
+**Ingen tvungen IndexedDB-version-migration var noedvendig i denne
+runde.** Begrundelse: `Report.values` er allerede et frit,
+skemaloest `Record<string, unknown>`-objekt (uaendret siden tidligere
+faser) - alle nye Drone-Obs-felter (observationMode, incidentId,
+droneCount, flightPattern, networkIndicators, disruptionType,
+linkedObservations, mgrs, mgrsSource, osv.) er valgfrie og laeses
+overalt med sikre fallbacks (`typeof x === "string" ? x : ...`,
+`Array.isArray(x) ? x : []`). Gamle Dronemelding-rapporter uden
+`observationMode` vises automatisk som "Grundig observation" (den mest
+daekkende visning, der viser alle oprindelige felter uden tab). Der
+opfindes ingen historiske GPS-, tidszone- eller netvaerksdata for gamle
+poster. `DB_VERSION` forbliver 2 (fra Fase 2.1) - selve
+objektbutikkerne og MediaItem-skemaet er uaendrede i denne runde.

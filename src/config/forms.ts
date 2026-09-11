@@ -12,6 +12,7 @@ import type { FormDefinition } from "../types";
 export const FORM_DEFINITIONS: FormDefinition[] = [
   {
     kind: "hurtig-rapport",
+    moduleColor: "#2E8B3D",
     titleId: "forms.hurtigRapport.title",
     descriptionId: "forms.hurtigRapport.description",
     disclaimerId: "forms.hurtigRapport.disclaimer",
@@ -24,6 +25,7 @@ export const FORM_DEFINITIONS: FormDefinition[] = [
   },
   {
     kind: "meldingsblanket",
+    moduleColor: "#2D4A27",
     titleId: "forms.meldingsblanket.title",
     descriptionId: "forms.meldingsblanket.description",
     disclaimerId: "forms.meldingsblanket.disclaimer",
@@ -36,6 +38,7 @@ export const FORM_DEFINITIONS: FormDefinition[] = [
   },
   {
     kind: "sitrep",
+    moduleColor: "#1B3A5C",
     titleId: "forms.sitrep.title",
     descriptionId: "forms.sitrep.description",
     disclaimerId: "forms.sitrep.disclaimer",
@@ -48,6 +51,7 @@ export const FORM_DEFINITIONS: FormDefinition[] = [
   },
   {
     kind: "nine-liner",
+    moduleColor: "#6B1F2A",
     titleId: "forms.nineLiner.title",
     descriptionId: "forms.nineLiner.description",
     disclaimerId: "forms.nineLiner.disclaimer",
@@ -60,6 +64,7 @@ export const FORM_DEFINITIONS: FormDefinition[] = [
   },
   {
     kind: "mist",
+    moduleColor: "#6B1F2A",
     titleId: "forms.mist.title",
     descriptionId: "forms.mist.description",
     disclaimerId: "forms.mist.disclaimer",
@@ -72,6 +77,7 @@ export const FORM_DEFINITIONS: FormDefinition[] = [
   },
   {
     kind: "dronemelding",
+    moduleColor: "#3B6E71",
     titleId: "forms.dronemelding.title",
     descriptionId: "forms.dronemelding.description",
     disclaimerId: "forms.dronemelding.disclaimer",
@@ -84,6 +90,7 @@ export const FORM_DEFINITIONS: FormDefinition[] = [
   },
   {
     kind: "sar-melding",
+    moduleColor: "#B3261E",
     titleId: "forms.sarMelding.title",
     descriptionId: "forms.sarMelding.description",
     disclaimerId: "forms.sarMelding.disclaimer",

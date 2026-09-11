@@ -6,6 +6,8 @@ const KEY = "form-library-overrides";
 export interface FormLibraryOverride {
   active: boolean;
   sortOrder: number;
+  highlighted?: boolean;
+  color?: string;
 }
 
 export type FormLibraryOverrides = Partial<Record<FormKind, FormLibraryOverride>>;

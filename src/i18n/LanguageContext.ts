@@ -6,6 +6,7 @@ export interface LanguageContextValue {
   setLanguage: (lang: LanguageCode) => void;
   t: (key: string) => string;
   tResolved: (key: string) => ResolvedString;
+  refreshOverrides: () => void;
 }
 
 export const LanguageContext = createContext<LanguageContextValue | null>(null);

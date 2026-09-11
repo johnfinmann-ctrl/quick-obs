@@ -6,6 +6,7 @@ import { BackButton } from "./BackButton";
 import { DisclaimerBadge } from "./DisclaimerBadge";
 import { PendingTranslationNote } from "./PendingTranslationNote";
 import { FormRenderer } from "./FormRenderer";
+import { MediaCapture } from "./fields/MediaCapture";
 import { ExportBar } from "./ExportBar";
 import { buildReportText, buildSitrepText, valuesLookAsSensitive } from "../utils/reportText";
 import styles from "./FormPage.module.css";
@@ -17,15 +18,28 @@ interface FormPageProps {
   onBack: () => void;
   /** Ekstra UI mellem sektionerne og gem-knappen (fx MIPRE-generator, MIST-kobling). */
   extraContent?: ReactNode;
+  /**
+   * Kritisk noedadvarsel/-procedure (fx nødkontakter), som SKAL vises
+   * FOER mediefunktionerne paa SAR/9-Liner/MIST - foto/video maa aldrig
+   * forsinke en nødmelding.
+   */
+  beforeMedia?: ReactNode;
   /** Kaldes efter en vellykket gemning, saa en formular kan tilbyde opfoelgende handlinger. */
   onSaved?: (report: Report) => void;
 }
 
+const hasMediaField = (sections: FieldSection[]) =>
+  sections.some((s) => s.fields.some((f) => f.type === "media"));
+
 /**
- * Faelles skal for de fem udfyldelige blanketter: titel, demomaerkning,
- * konfigurationsstyrede felter, gem/kladde-status og eksport.
+ * Faelles skal for alle udfyldelige blanketter. Medie-foerst-flow:
+ * 1) evt. kritisk noedadvarsel (beforeMedia), 2) "Dokumentér haendelsen"
+ * (foto/video/tale/vaelg eksisterende), 3) blankettens oevrige felter,
+ * 4) gem/del/eksportér. Der findes kun ÉN mediekomponent
+ * (`fields/MediaCapture`), som genbruges her - aldrig kopieret ind i
+ * de enkelte blanketter.
  */
-export function FormPage({ form, sections, draft, onBack, extraContent, onSaved }: FormPageProps) {
+export function FormPage({ form, sections, draft, onBack, extraContent, beforeMedia, onSaved }: FormPageProps) {
   const { tResolved, t } = useTranslation();
   const title = tResolved(form.titleId);
   const description = tResolved(form.descriptionId);
@@ -60,6 +74,7 @@ export function FormPage({ form, sections, draft, onBack, extraContent, onSaved 
   }
 
   const activeReport: Report | null = savedReport;
+  const showMediaCard = hasMediaField(sections);
 
   return (
     <div className={styles.container}>
@@ -67,16 +82,26 @@ export function FormPage({ form, sections, draft, onBack, extraContent, onSaved 
         <BackButton onClick={onBack} />
       </div>
 
-      <div>
-        <h1 className={styles.title}>{title.text}</h1>
-        <PendingTranslationNote show={title.isPendingApproval} />
+      <div style={{ borderLeft: `6px solid ${form.moduleColor}`, paddingLeft: 12 }}>
+        <h1 className={styles.title}>
+          {title.text}
+          <PendingTranslationNote show={title.isPendingApproval} />
+        </h1>
       </div>
       <div>
-        <p className={styles.description}>{description.text}</p>
-        <PendingTranslationNote show={description.isPendingApproval} />
+        <p className={styles.description}>
+          {description.text}
+          <PendingTranslationNote show={description.isPendingApproval} />
+        </p>
       </div>
 
       <DisclaimerBadge form={form} />
+
+      {beforeMedia}
+
+      {showMediaCard && !activeReport && (
+        <MediaCapture ids={draft.mediaIds} onChange={draft.setMediaIds} />
+      )}
 
       {draft.lastSavedAt && !activeReport && (
         <p className={styles.autosaveStatus}>
@@ -90,6 +115,7 @@ export function FormPage({ form, sections, draft, onBack, extraContent, onSaved 
         onChange={draft.setField}
         mediaIds={draft.mediaIds}
         onMediaChange={draft.setMediaIds}
+        hideMedia
       />
 
       {extraContent}
@@ -106,7 +132,8 @@ export function FormPage({ form, sections, draft, onBack, extraContent, onSaved 
                 ? buildSitrepText(activeReport, sections, t, title.text)
                 : buildReportText(activeReport, sections, t, title.text)
             }
-            sensitive={valuesLookAsSensitive(activeReport.values)}
+            sensitive={valuesLookAsSensitive(activeReport.values, activeReport.mediaIds.length)}
+            photoMediaIds={activeReport.mediaIds}
           />
         </>
       ) : (

@@ -2,10 +2,10 @@
   width: 100%;
   max-width: var(--qo-max-content-width);
   margin: 0 auto;
-  padding: var(--qo-space-4) var(--qo-space-4) var(--qo-space-7);
+  padding: var(--qo-space-3) var(--qo-space-4) var(--qo-space-7);
   display: flex;
   flex-direction: column;
-  gap: var(--qo-space-4);
+  gap: var(--qo-space-3);
 }
 
 .topRow {
@@ -66,10 +66,16 @@
 }
 
 .savedBanner {
-  padding: var(--qo-space-3);
-  border-radius: var(--qo-radius);
+  padding: var(--qo-space-3) var(--qo-space-4);
+  border-radius: var(--qo-radius-lg);
   background: #e3ead9;
   color: var(--qo-color-primary-dark);
   font-weight: 700;
   margin: 0;
+  box-shadow: 0 1px 3px rgba(18, 24, 17, 0.07);
+}
+
+:root[data-qo-theme="dark"] .savedBanner {
+  background: #1f3419;
+  color: #cfe8c4;
 }

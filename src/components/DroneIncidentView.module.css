@@ -1,0 +1,27 @@
+.container {
+  width: 100%;
+  max-width: var(--qo-max-content-width);
+  margin: 0 auto;
+  padding: 16px 16px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.title {
+  color: var(--qo-color-heading);
+  margin: 0;
+}
+
+.item {
+  border: 1px solid var(--qo-color-border);
+  border-radius: 12px;
+  padding: 12px;
+  background: var(--qo-color-bg-light);
+  box-shadow: 0 1px 3px rgba(18, 24, 17, 0.06);
+}
+
+:root[data-qo-theme="dark"] .item {
+  background: #17211a;
+  border-color: #2c3a27;
+}

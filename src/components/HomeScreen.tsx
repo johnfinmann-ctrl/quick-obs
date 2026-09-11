@@ -14,6 +14,7 @@ import type { FormKind } from "../types";
 import { useTranslation } from "../i18n/useTranslation";
 import { useFormLibrary } from "../formLibrary/useFormLibrary";
 import { FormButton } from "./FormButton";
+import { MODULE_COLORS } from "../config/moduleColors";
 import styles from "./HomeScreen.module.css";
 
 const ICONS: Record<FormKind, LucideIcon> = {
@@ -63,12 +64,12 @@ export function HomeScreen({ onSelectForm, onOpenFormLibrary, onOpenHistory }: H
 
         {quick && (
           <div className={styles.fullWidth}>
-            <FormButton titleId={quick.titleId} Icon={ICONS[quick.kind]} onSelect={() => onSelectForm(quick.kind)} />
+            <FormButton titleId={quick.titleId} Icon={ICONS[quick.kind]} color={quick.moduleColor} highlighted={quick.highlighted} onSelect={() => onSelectForm(quick.kind)} />
           </div>
         )}
 
         {other.map((form) => (
-          <FormButton key={form.kind} titleId={form.titleId} Icon={ICONS[form.kind]} onSelect={() => onSelectForm(form.kind)} />
+          <FormButton key={form.kind} titleId={form.titleId} Icon={ICONS[form.kind]} color={form.moduleColor} highlighted={form.highlighted} onSelect={() => onSelectForm(form.kind)} />
         ))}
 
         {medical.length > 0 && (
@@ -77,14 +78,14 @@ export function HomeScreen({ onSelectForm, onOpenFormLibrary, onOpenHistory }: H
           </p>
         )}
         {medical.map((form) => (
-          <FormButton key={form.kind} titleId={form.titleId} Icon={ICONS[form.kind]} onSelect={() => onSelectForm(form.kind)} />
+          <FormButton key={form.kind} titleId={form.titleId} Icon={ICONS[form.kind]} color={form.moduleColor} highlighted={form.highlighted} onSelect={() => onSelectForm(form.kind)} />
         ))}
 
         <p className={styles.sectionLabel} style={{ gridColumn: "1 / -1" }}>
           {t("home.moreSection")}
         </p>
-        <FormButton titleId="formLibrary.title" Icon={Library} onSelect={onOpenFormLibrary} />
-        <FormButton titleId="nav.history" Icon={History} onSelect={onOpenHistory} />
+        <FormButton titleId="formLibrary.title" Icon={Library} color={MODULE_COLORS.formLibrary} onSelect={onOpenFormLibrary} />
+        <FormButton titleId="nav.history" Icon={History} color={MODULE_COLORS.history} onSelect={onOpenHistory} />
       </section>
     </div>
   );

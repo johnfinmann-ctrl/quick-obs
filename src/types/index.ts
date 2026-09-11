@@ -27,6 +27,8 @@ export interface FormDefinition {
   descriptionId: string;
   disclaimerId: string;
   accent?: "default" | "mayday" | "pan-pan" | "warning";
+  /** Modulfarve (hex) - fra den faste, tilgaengelige Fase 2.1-palette. Bruges til farvede modulhoveder/-knapper. */
+  moduleColor: string;
   /** Blanketbibliotek-metadata (konfigurationsstyret, redigerbar i administration). */
   version: string;
   status: FormLibraryStatus;
@@ -36,7 +38,7 @@ export interface FormDefinition {
 }
 
 /** Navigationsstadier. */
-export type AppView = "home" | "history" | "admin" | "contacts" | "form-library" | "drone-surveillance" | FormKind;
+export type AppView = "home" | "history" | "admin" | "contacts" | "form-library" | "drone-surveillance" | "drone-incident" | FormKind;
 
 /** Generisk feltvaerdi-container for en blanket (Fase 2). Noeglen er felt-id'et. */
 export type FormValues = Record<string, unknown>;
@@ -49,6 +51,7 @@ export type FieldType =
   | "checkbox"
   | "datetime"
   | "gps"
+  | "mgrs"
   | "media";
 
 export interface FieldOption {
@@ -71,6 +74,8 @@ export interface FieldSection {
   id: string;
   titleId: string;
   fields: FieldDefinition[];
+  /** Naar true, starter sektionen sammenfoldet (til lange, sjaeldent brugte sektioner). Standard: aaben. */
+  defaultCollapsed?: boolean;
 }
 
 /** Et gemt, "faerdigt" (ikke-kladde) rapportobjekt i historikken. */
@@ -99,6 +104,12 @@ export interface Draft {
   updatedAt: string;
 }
 
+export interface MediaGpsMetadata {
+  latitude: number;
+  longitude: number;
+  accuracyMeters: number | null;
+}
+
 export interface MediaItem {
   id: string;
   blob: Blob;
@@ -112,6 +123,18 @@ export interface MediaItem {
   name?: string;
   /** Optagelseslaengde i sekunder, for lyd/video. */
   durationSeconds?: number;
+
+  /** "captured" = optaget i appen. "imported" = valgt fra enhedens filer. */
+  origin: "captured" | "imported";
+  /** UTC-tidspunkt (ISO 8601) for selve optagelsen - IKKE oprindelige EXIF-data for importerede filer. */
+  capturedAtUtc: string | null;
+  timeZone: string | null;
+  utcOffsetMinutes: number | null;
+  localDateTime: string | null;
+  /** GPS paa tidspunktet for optagelse, hvis tilgaengelig. Ikke forsoegt udledt for importerede filer. */
+  gps: MediaGpsMetadata | null;
+  /** For video: om mikrofonen var aktiv under optagelsen. Null = ikke relevant (foto/lyd) eller ukendt. */
+  micActive: boolean | null;
 }
 
 export type ContactRegion = "groenland" | "faeroeerne" | "danmark" | "andet";
@@ -141,6 +164,11 @@ export interface AppSettings {
   autoDeleteHours: 0 | 24 | 48 | 72;
   /** Administratoren kan slaa kortvisning (Leaflet/OSM-fliser) fra globalt. */
   mapEnabled: boolean;
+  /** Foretrukket startmodul - "home" for den almindelige forside. */
+  startModule: string;
+  /** Automatisk eller manuel tidszone (IANA), jf. Fase 2.1 tidszoneadministration. */
+  timeZoneMode: "auto" | "manual";
+  manualTimeZone: string | null;
 }
 
 /**

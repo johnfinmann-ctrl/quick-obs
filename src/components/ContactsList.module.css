@@ -11,6 +11,8 @@
   display: flex;
   flex-direction: column;
   gap: var(--qo-space-1);
+  background: var(--qo-color-bg-light);
+  box-shadow: 0 1px 3px rgba(18, 24, 17, 0.06);
 }
 
 .name {
@@ -71,4 +73,9 @@
   font-size: var(--qo-font-size-sm);
   color: var(--qo-color-mayday);
   font-weight: 700;
+}
+
+:root[data-qo-theme="dark"] .card {
+  background: #17211a;
+  border-color: #2c3a27;
 }

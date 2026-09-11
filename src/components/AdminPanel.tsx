@@ -10,10 +10,22 @@ import { listContacts, saveContact, deleteContact } from "../storage/contacts";
 import { estimateStorage } from "../storage/db";
 import { exportBackup, importBackup, resetDemoData } from "../storage/backup";
 import { loadDraft, clearDraft } from "../storage/drafts";
-import { computeCoverage } from "../i18n/coverage";
+import { computeCoverage, getMissingKeys } from "../i18n/coverage";
 import { downloadTranslationExport } from "../i18n/exportTranslationFile";
+import { validateTranslationImport, saveTranslationOverrides } from "../storage/translationOverrides";
 import { useFormLibrary } from "../formLibrary/useFormLibrary";
 import { FORM_DEFINITIONS } from "../config/forms";
+import { MODULE_COLOR_PALETTE } from "../config/modulePalette";
+import {
+  detectDeviceTimeZone,
+  isValidIanaTimeZone,
+  getUtcOffsetMinutes,
+  formatLocalDateTime,
+  formatDtgZulu,
+  formatUtcOffsetLabel,
+  localDateTimeStringToUtcDate,
+  nowAsLocalDateTimeInputValue,
+} from "../utils/time";
 import {
   PRECEDENCE_OPTIONS,
   SPECIAL_EQUIPMENT_OPTIONS,
@@ -82,11 +94,12 @@ export function AdminPanel({ onBack }: { onBack: () => void }) {
       <h1 className={styles.title}>{t("admin.title")}</h1>
       <p className={styles.warningNote}>{t("admin.pin.notMilitaryGrade")}</p>
 
-      <FormLibrarySection t={t} />
+      <FormLibrarySection t={t} settings={settings} setSettings={setSettings} />
       <ContactsSection t={t} />
       <NineLinerCodesSection t={t} />
       <SettingsSection settings={settings} setSettings={setSettings} t={t} />
       <MapSection settings={settings} setSettings={setSettings} t={t} />
+      <TimeZoneSection settings={settings} setSettings={setSettings} t={t} />
       <StorageSection t={t} />
       <DraftsSection t={t} />
       <BackupSection t={t} />
@@ -361,8 +374,30 @@ function BackupSection({ t }: { t: Translate }) {
 }
 
 function TranslationStatusSection({ t }: { t: Translate }) {
+  const { refreshOverrides } = useTranslation();
   const kl = computeCoverage("kl");
   const fo = computeCoverage("fo");
+  const [showMissing, setShowMissing] = useState<"kl" | "fo" | null>(null);
+  const [importStatus, setImportStatus] = useState<string | null>(null);
+
+  async function handleImport(lang: "kl" | "fo", e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const payload = JSON.parse(text);
+      const result = validateTranslationImport(payload, lang);
+      if (!result.ok) {
+        setImportStatus(`${lang.toUpperCase()}: ${result.error}`);
+        return;
+      }
+      await saveTranslationOverrides(lang, result.values);
+      refreshOverrides();
+      setImportStatus(t("admin.translations.importSuccess").replace("{n}", String(Object.keys(result.values).length)));
+    } catch {
+      setImportStatus(t("admin.translations.importFailed"));
+    }
+  }
 
   return (
     <section className={styles.section}>
@@ -373,46 +408,92 @@ function TranslationStatusSection({ t }: { t: Translate }) {
         <strong>{t("admin.translations.da")}</strong>
         <span className={styles.small}>{t("admin.translations.daStatus")}</span>
       </div>
-      <div>
-        <div className={styles.row} style={{ justifyContent: "space-between" }}>
-          <strong>{t("admin.translations.fo")}</strong>
-          <span className={styles.small}>{t("admin.translations.foStatus")}</span>
+
+      {[
+        { code: "fo" as const, stats: fo, label: t("admin.translations.fo"), status: t("admin.translations.foStatus") },
+        { code: "kl" as const, stats: kl, label: t("admin.translations.kl"), status: t("admin.translations.klStatus") },
+      ].map(({ code, stats, label, status }) => (
+        <div key={code}>
+          <div className={styles.row} style={{ justifyContent: "space-between" }}>
+            <strong>{label}</strong>
+            <span className={styles.small}>{status}</span>
+          </div>
+          <p className={styles.small}>
+            {t("admin.translations.total")}: {stats.total} · {t("admin.translations.translated")}: {stats.translated} ·{" "}
+            {t("admin.translations.missing")}: {stats.total - stats.translated} ({stats.percent}%)
+          </p>
+          <div className={styles.progressTrack}>
+            <div className={styles.progressFill} style={{ width: `${stats.percent}%` }} />
+          </div>
+          <div className={styles.row}>
+            <button type="button" className={styles.button} onClick={() => setShowMissing(showMissing === code ? null : code)}>
+              {t("admin.translations.showMissing")}
+            </button>
+            <label className={styles.button} style={{ display: "inline-block" }}>
+              {t("admin.translations.importFile")}
+              <input type="file" accept="application/json" style={{ display: "none" }} onChange={(e) => handleImport(code, e)} />
+            </label>
+          </div>
+          {showMissing === code && (
+            <ul style={{ maxHeight: 160, overflowY: "auto", fontSize: "0.8rem", opacity: 0.8 }}>
+              {getMissingKeys(code).map((k) => (
+                <li key={k}>{k}</li>
+              ))}
+            </ul>
+          )}
         </div>
-        <p className={styles.small}>
-          {fo.translated}/{fo.total} ({fo.percent}%)
-        </p>
-        <div className={styles.progressTrack}>
-          <div className={styles.progressFill} style={{ width: `${fo.percent}%` }} />
-        </div>
-      </div>
-      <div>
-        <div className={styles.row} style={{ justifyContent: "space-between" }}>
-          <strong>{t("admin.translations.kl")}</strong>
-          <span className={styles.small}>{t("admin.translations.klStatus")}</span>
-        </div>
-        <p className={styles.small}>
-          {kl.translated}/{kl.total} ({kl.percent}%)
-        </p>
-        <div className={styles.progressTrack}>
-          <div className={styles.progressFill} style={{ width: `${kl.percent}%` }} />
-        </div>
-      </div>
+      ))}
+
+      {importStatus && <p className={styles.small}>{importStatus}</p>}
 
       <button type="button" className={styles.button} onClick={downloadTranslationExport}>
         {t("admin.translations.exportSource")}
       </button>
       <p className={styles.small}>{t("admin.translations.exportSourceHelp")}</p>
+      <p className={styles.small}>{t("admin.translations.importValidationNote")}</p>
     </section>
   );
 }
 
-function FormLibrarySection({ t }: { t: Translate }) {
-  const { definitions, setOverride } = useFormLibrary();
+function FormLibrarySection({
+  t,
+  settings,
+  setSettings,
+}: {
+  t: Translate;
+  settings: AppSettings;
+  setSettings: (s: AppSettings) => void;
+}) {
+  const { definitions, setOverride, resetToDefaults } = useFormLibrary();
+
+  async function updateStartModule(value: string) {
+    const next = { ...settings, startModule: value };
+    await saveSettings(next);
+    setSettings(next);
+  }
 
   return (
     <section className={styles.section}>
       <h2 className={styles.sectionTitle}>{t("formLibrary.title")}</h2>
       <p className={styles.small}>{t("admin.formLibrary.help")}</p>
+
+      <label>
+        {t("admin.formLibrary.startModule")}
+        <select
+          className={styles.input}
+          style={{ display: "block", marginTop: 4, width: "100%" }}
+          value={settings.startModule}
+          onChange={(e) => updateStartModule(e.target.value)}
+        >
+          <option value="home">{t("admin.formLibrary.startModuleHome")}</option>
+          {definitions.map((def) => (
+            <option key={def.kind} value={def.kind}>
+              {t(def.titleId)}
+            </option>
+          ))}
+        </select>
+      </label>
+
       {definitions.map((def) => (
         <div key={def.kind} className={styles.contactCard}>
           <div className={styles.row} style={{ justifyContent: "space-between" }}>
@@ -435,12 +516,131 @@ function FormLibrarySection({ t }: { t: Translate }) {
               value={def.sortOrder}
               onChange={(e) => setOverride(def.kind, { active: def.active, sortOrder: Number(e.target.value) })}
             />
+            <label className={styles.row}>
+              <input
+                type="checkbox"
+                checked={def.highlighted ?? false}
+                onChange={(e) => setOverride(def.kind, { active: def.active, sortOrder: def.sortOrder, highlighted: e.target.checked })}
+              />
+              {t("admin.formLibrary.highlight")}
+            </label>
+          </div>
+          <div className={styles.row}>
+            <label className={styles.small}>{t("admin.formLibrary.moduleColor")}</label>
+            {MODULE_COLOR_PALETTE.map((c) => (
+              <button
+                key={c.value}
+                type="button"
+                title={t(c.labelId)}
+                onClick={() => setOverride(def.kind, { active: def.active, sortOrder: def.sortOrder, color: c.value })}
+                style={{
+                  width: 28,
+                  height: 28,
+                  borderRadius: "50%",
+                  background: c.value,
+                  border: def.moduleColor === c.value ? "3px solid var(--qo-color-heading)" : "1px solid var(--qo-color-border)",
+                  cursor: "pointer",
+                }}
+                aria-label={t(c.labelId)}
+              />
+            ))}
           </div>
           <p className={styles.small}>
             v{def.version} · {t(`formLibrary.status.${def.status}`)} · {def.lastReview}
           </p>
         </div>
       ))}
+
+      <button type="button" className={styles.dangerButton} onClick={resetToDefaults}>
+        {t("admin.formLibrary.restoreDefaults")}
+      </button>
+    </section>
+  );
+}
+
+function TimeZoneSection({
+  t,
+  settings,
+  setSettings,
+}: {
+  t: Translate;
+  settings: AppSettings;
+  setSettings: (s: AppSettings) => void;
+}) {
+  const [manualInput, setManualInput] = useState(settings.manualTimeZone ?? "");
+  const [validationError, setValidationError] = useState<string | null>(null);
+  const [testDate, setTestDate] = useState(() => nowAsLocalDateTimeInputValue());
+
+  const effectiveTz = settings.timeZoneMode === "manual" && settings.manualTimeZone ? settings.manualTimeZone : detectDeviceTimeZone();
+
+  async function useAutomatic() {
+    const next = { ...settings, timeZoneMode: "auto" as const, manualTimeZone: null };
+    await saveSettings(next);
+    setSettings(next);
+    setValidationError(null);
+  }
+
+  async function useManual() {
+    if (!isValidIanaTimeZone(manualInput)) {
+      setValidationError(t("admin.timezone.invalid"));
+      return;
+    }
+    setValidationError(null);
+    const next = { ...settings, timeZoneMode: "manual" as const, manualTimeZone: manualInput };
+    await saveSettings(next);
+    setSettings(next);
+  }
+
+  const testUtc = localDateTimeStringToUtcDate(testDate, effectiveTz);
+
+  return (
+    <section className={styles.section}>
+      <h2 className={styles.sectionTitle}>{t("admin.timezone.title")}</h2>
+      <p className={styles.small}>
+        {t("admin.timezone.current")}: <strong>{effectiveTz}</strong> ({settings.timeZoneMode === "manual" ? t("admin.timezone.manual") : t("admin.timezone.auto")})
+      </p>
+      {testUtc && (
+        <>
+          <p className={styles.small}>
+            {t("admin.timezone.utcOffset")}: {formatUtcOffsetLabel(getUtcOffsetMinutes(testUtc, effectiveTz))}
+          </p>
+          <p className={styles.small}>
+            {t("admin.timezone.localExample")}: {formatLocalDateTime(testUtc, effectiveTz)}
+          </p>
+          <p className={styles.small}>DTG: {formatDtgZulu(testUtc)}</p>
+        </>
+      )}
+
+      <div className={styles.row}>
+        <button type="button" className={styles.button} onClick={useAutomatic}>
+          {t("admin.timezone.useAuto")}
+        </button>
+      </div>
+      <div className={styles.row}>
+        <input
+          className={styles.input}
+          style={{ flex: 1, minWidth: 160 }}
+          value={manualInput}
+          placeholder="fx America/Nuuk"
+          onChange={(e) => setManualInput(e.target.value)}
+        />
+        <button type="button" className={styles.button} onClick={useManual}>
+          {t("admin.timezone.useManual")}
+        </button>
+      </div>
+      {validationError && <p style={{ color: "var(--qo-color-mayday)" }}>{validationError}</p>}
+
+      <label>
+        {t("admin.timezone.testDate")}
+        <input
+          type="datetime-local"
+          className={styles.input}
+          style={{ display: "block", marginTop: 4, width: "100%" }}
+          value={testDate}
+          onChange={(e) => setTestDate(e.target.value)}
+        />
+      </label>
+      <p className={styles.small}>{t("admin.timezone.testHelp")}</p>
     </section>
   );
 }

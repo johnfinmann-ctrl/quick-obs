@@ -4,10 +4,11 @@ import type { FormLibraryOverride } from "../storage/formLibrary";
 
 export interface FormLibraryContextValue {
   /** Effektive definitioner: FORM_DEFINITIONS flettet med gemte admin-overrides, sorteret. */
-  definitions: FormDefinition[];
+  definitions: (FormDefinition & { highlighted?: boolean })[];
   /** Kun de aktive, i sorteret raekkefoelge - bruges paa forsiden. */
-  activeDefinitions: FormDefinition[];
+  activeDefinitions: (FormDefinition & { highlighted?: boolean })[];
   setOverride: (kind: FormKind, patch: Partial<FormLibraryOverride>) => void;
+  resetToDefaults: () => void;
   loaded: boolean;
 }
 

@@ -130,7 +130,8 @@ export function HistoryView({ onBack, onOpenReport }: HistoryViewProps) {
                     ? buildSitrepText(report, sections, t, t(form.titleId))
                     : buildReportText(report, sections, t, t(form.titleId))
                 }
-                sensitive={valuesLookAsSensitive(report.values)}
+                sensitive={valuesLookAsSensitive(report.values, report.mediaIds.length)}
+                photoMediaIds={report.mediaIds}
               />
             )}
           </div>

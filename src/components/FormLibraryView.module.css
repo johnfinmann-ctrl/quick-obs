@@ -20,6 +20,8 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+  background: var(--qo-color-bg-light);
+  box-shadow: 0 1px 3px rgba(18, 24, 17, 0.06);
 }
 
 .cardTop {
@@ -50,4 +52,9 @@
   font-size: 0.875rem;
   opacity: 0.75;
   margin: 0;
+}
+
+:root[data-qo-theme="dark"] .card {
+  background: #17211a;
+  border-color: #2c3a27;
 }

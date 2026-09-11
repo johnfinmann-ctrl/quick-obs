@@ -25,13 +25,13 @@ export function FieldWrapper({ labelId, helpId, required, htmlFor, children }: F
             *
           </span>
         )}
+        <PendingTranslationNote show={label.isPendingApproval} />
       </label>
-      <PendingTranslationNote show={label.isPendingApproval} />
       {help && (
-        <>
-          <p className={styles.help}>{help.text}</p>
+        <p className={styles.help}>
+          {help.text}
           <PendingTranslationNote show={help.isPendingApproval} />
-        </>
+        </p>
       )}
       {children}
     </div>

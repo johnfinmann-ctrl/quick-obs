@@ -2,11 +2,23 @@
  * Quick-Obs - lokal IndexedDB-lagring.
  *
  * Al data forbliver paa enheden. Ingen cloud-synkronisering. Databasen er
- * versioneret, saa fremtidige faser kan migrere skemaet uden datatab.
+ * versioneret, saa senere faser kan migrere skemaet uden datatab.
+ *
+ * VERSION 2 (Fase 2.1): MediaItem fik nye felter (capturedAtUtc,
+ * timeZone, utcOffsetMinutes, localDateTime, gps, micActive, origin).
+ * Selve objektbutikkerne er uaendrede (IndexedDB er skemalos pr. post),
+ * men eksisterende medieposter fra version 1 mangler disse felter.
+ * Migrationen herunder tilfoejer dem eksplicit med `null`/"imported" som
+ * sikre standardvaerdier - der opdigtes ALDRIG et GPS-punkt eller
+ * optagelsestidspunkt for gamle poster. UI'et viser "ikke registreret"
+ * for disse felter (se `fields.media.legacyNotRecorded`). Migrationen
+ * koerer kun via IndexedDBs `onupgradeneeded` (staar for version < 2),
+ * og er derfor i sagens natur idempotent - den koerer aldrig to gange
+ * for samme browser-database.
  */
 
 export const DB_NAME = "quick-obs";
-export const DB_VERSION = 1;
+export const DB_VERSION = 2;
 
 export const STORES = {
   drafts: "drafts",
@@ -17,6 +29,35 @@ export const STORES = {
 } as const;
 
 let dbPromise: Promise<IDBDatabase> | null = null;
+
+interface LegacyMediaV1 {
+  id: string;
+  [key: string]: unknown;
+}
+
+function migrateMediaV1ToV2(db: IDBDatabase, tx: IDBTransaction) {
+  if (!db.objectStoreNames.contains(STORES.media)) return;
+  const store = tx.objectStore(STORES.media);
+  const cursorRequest = store.openCursor();
+  cursorRequest.onsuccess = () => {
+    const cursor = cursorRequest.result;
+    if (!cursor) return;
+    const record = cursor.value as LegacyMediaV1;
+    if (record.origin === undefined) {
+      cursor.update({
+        ...record,
+        origin: "imported",
+        capturedAtUtc: null,
+        timeZone: null,
+        utcOffsetMinutes: null,
+        localDateTime: null,
+        gps: null,
+        micActive: null,
+      });
+    }
+    cursor.continue();
+  };
+}
 
 function openDb(): Promise<IDBDatabase> {
   if (dbPromise) return dbPromise;
@@ -29,8 +70,10 @@ function openDb(): Promise<IDBDatabase> {
 
     const request = indexedDB.open(DB_NAME, DB_VERSION);
 
-    request.onupgradeneeded = () => {
+    request.onupgradeneeded = (event) => {
       const db = request.result;
+      const tx = request.transaction!;
+
       if (!db.objectStoreNames.contains(STORES.drafts)) {
         db.createObjectStore(STORES.drafts, { keyPath: "kind" });
       }
@@ -47,6 +90,10 @@ function openDb(): Promise<IDBDatabase> {
       }
       if (!db.objectStoreNames.contains(STORES.settings)) {
         db.createObjectStore(STORES.settings, { keyPath: "key" });
+      }
+
+      if (event.oldVersion > 0 && event.oldVersion < 2) {
+        migrateMediaV1ToV2(db, tx);
       }
     };
 

@@ -37,6 +37,7 @@ export function NineLinerForm({ onBack, onCreateLinkedMist }: NineLinerFormProps
       draft={draft}
       onBack={onBack}
       onSaved={(report) => setSavedReport(report)}
+      beforeMedia={<p style={{ fontWeight: 700, color: "var(--qo-color-mayday)" }}>{t("fields.nineLiner.emergencyBeforeMedia")}</p>}
       extraContent={
         <>
           <p style={{ fontSize: "0.875rem", opacity: 0.8 }}>{t("fields.nineLiner.localProcedureNotice")}</p>

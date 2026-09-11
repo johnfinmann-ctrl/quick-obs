@@ -1,11 +1,12 @@
 .badge {
   margin: 0;
   padding: var(--qo-space-3);
-  border-radius: var(--qo-radius);
+  border-radius: var(--qo-radius-lg);
   font-size: var(--qo-font-size-sm);
   font-weight: 700;
   line-height: 1.35;
   border: 2px solid transparent;
+  box-shadow: 0 1px 3px rgba(18, 24, 17, 0.06);
 }
 
 /* Baggrundene er bevidst solide pastelfarver (ikke gennemsigtige overlays

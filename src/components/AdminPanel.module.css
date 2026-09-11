@@ -27,11 +27,18 @@
 
 .section {
   border: 1px solid var(--qo-color-border);
-  border-radius: var(--qo-radius);
+  border-radius: var(--qo-radius-lg);
   padding: var(--qo-space-4);
   display: flex;
   flex-direction: column;
   gap: var(--qo-space-3);
+  background: var(--qo-color-bg-light);
+  box-shadow: 0 1px 3px rgba(18, 24, 17, 0.06);
+}
+
+:root[data-qo-theme="dark"] .section {
+  background: #17211a;
+  border-color: #2c3a27;
 }
 
 .sectionTitle {

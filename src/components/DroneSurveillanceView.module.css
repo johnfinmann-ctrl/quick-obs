@@ -20,6 +20,7 @@
   color: #7a1414;
   font-weight: 700;
   margin: 0;
+  box-shadow: 0 1px 3px rgba(18, 24, 17, 0.06);
 }
 
 .testDataBanner {
@@ -29,6 +30,7 @@
   color: #5c4400;
   font-weight: 700;
   margin: 0;
+  box-shadow: 0 1px 3px rgba(18, 24, 17, 0.06);
 }
 
 .timeline {
@@ -42,4 +44,11 @@
   border-radius: 12px;
   padding: 12px;
   font-size: 0.9rem;
+  background: var(--qo-color-bg-light);
+  box-shadow: 0 1px 3px rgba(18, 24, 17, 0.06);
+}
+
+:root[data-qo-theme="dark"] .timelineItem {
+  background: #17211a;
+  border-color: #2c3a27;
 }

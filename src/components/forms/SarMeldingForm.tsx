@@ -46,31 +46,32 @@ export function SarMeldingForm({ onBack }: { onBack: () => void }) {
       sections={SAR_SECTIONS}
       draft={draft}
       onBack={onBack}
+      beforeMedia={
+        draft.loaded ? (
+          <FieldWrapper labelId="contacts.title" helpId="fields.sar.emergencyBeforeMediaHelp">
+            <ContactsList domainFilter={branch} />
+          </FieldWrapper>
+        ) : null
+      }
       extraContent={
         draft.loaded ? (
-          <>
-            <FieldWrapper labelId="fields.sar.mipre.title" helpId="fields.sar.mipre.help">
-              <button
-                type="button"
-                className={styles.smallButton}
-                style={{ marginBottom: 8 }}
-                onClick={() => draft.setField("mipreText", buildMipreText(draft.values, t))}
-              >
-                {t("fields.sar.mipre.generate")}
-              </button>
-              <textarea
-                className={styles.input}
-                style={{ minHeight: 160, fontFamily: "monospace" }}
-                value={mipreText}
-                onChange={(e) => draft.setField("mipreText", e.target.value)}
-                placeholder={t("fields.sar.mipre.placeholder")}
-              />
-            </FieldWrapper>
-
-            <FieldWrapper labelId="contacts.title">
-              <ContactsList domainFilter={branch} />
-            </FieldWrapper>
-          </>
+          <FieldWrapper labelId="fields.sar.mipre.title" helpId="fields.sar.mipre.help">
+            <button
+              type="button"
+              className={styles.smallButton}
+              style={{ marginBottom: 8 }}
+              onClick={() => draft.setField("mipreText", buildMipreText(draft.values, t))}
+            >
+              {t("fields.sar.mipre.generate")}
+            </button>
+            <textarea
+              className={styles.input}
+              style={{ minHeight: 160, fontFamily: "monospace" }}
+              value={mipreText}
+              onChange={(e) => draft.setField("mipreText", e.target.value)}
+              placeholder={t("fields.sar.mipre.placeholder")}
+            />
+          </FieldWrapper>
         ) : null
       }
     />

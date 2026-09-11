@@ -1,0 +1,27 @@
+.preview {
+  width: 100%;
+  max-height: 280px;
+  border-radius: 12px;
+  background: #000;
+  display: block;
+}
+
+.micStatus {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.micOn { background: #e3ead9; color: var(--qo-color-primary-dark); }
+.micOff { background: #f7e7b8; color: #5c4400; }
+
+.buttonRow {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}

@@ -2,9 +2,10 @@
   background: var(--qo-color-warning);
   color: #23230f;
   font-weight: 700;
-  font-size: var(--qo-font-size-sm);
+  font-size: 0.75rem;
   letter-spacing: 0.02em;
   text-align: center;
-  padding: var(--qo-space-2) var(--qo-space-3);
+  padding: 4px var(--qo-space-3);
   width: 100%;
+  line-height: 1.3;
 }

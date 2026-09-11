@@ -26,7 +26,7 @@ export interface CoverageStats {
   percent: number;
 }
 
-/** Beregner hvor stor en andel af de danske streng-ID'er der har en udfyldt KL/FO-tekst. */
+/** Beregner hvor stor en andel af de danske streng-ID'er der har en udfyldt KL/FO-tekst (kompileret udkast, ikke inkl. runtime-importer). */
 export function computeCoverage(lang: "kl" | "fo"): CoverageStats {
   const keys = flattenKeys(da);
   const pack = lang === "kl" ? kl : fo;
@@ -39,4 +39,18 @@ export function computeCoverage(lang: "kl" | "fo"): CoverageStats {
     translated,
     percent: keys.length ? Math.round((translated / keys.length) * 100) : 0,
   };
+}
+
+/** Returnerer de danske streng-ID'er, der IKKE har en kompileret oversaettelse for det givne sprog. */
+export function getMissingKeys(lang: "kl" | "fo"): string[] {
+  const keys = flattenKeys(da);
+  const pack = lang === "kl" ? kl : fo;
+  return keys.filter((k) => {
+    const v = getByPath(pack, k);
+    return !(typeof v === "string" && v.trim().length > 0);
+  });
+}
+
+export function getAllDanishKeys(): string[] {
+  return flattenKeys(da);
 }

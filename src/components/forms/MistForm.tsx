@@ -28,6 +28,7 @@ export function MistForm({ onBack }: { onBack: () => void }) {
       sections={MIST_SECTIONS}
       draft={draft}
       onBack={onBack}
+      beforeMedia={<p style={{ fontWeight: 700, color: "var(--qo-color-mayday)" }}>{t("fields.mist.emergencyBeforeMedia")}</p>}
       extraContent={
         draft.loaded ? (
           <FieldWrapper labelId="fields.mist.linkedNineLiner" htmlFor="linkedNineLiner">

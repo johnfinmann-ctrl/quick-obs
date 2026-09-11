@@ -1,15 +1,57 @@
 .section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--qo-space-4);
-  margin-bottom: var(--qo-space-5);
+  display: block;
+  margin-bottom: var(--qo-space-3);
+  background: var(--qo-color-bg-light);
+  border: 1px solid var(--qo-color-border);
+  border-radius: var(--qo-radius-lg);
+  padding: var(--qo-space-4);
+  box-shadow: 0 1px 3px rgba(18, 24, 17, 0.07);
 }
 
+:root[data-qo-theme="dark"] .section {
+  background: #17211a;
+  border-color: #2c3a27;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+
+/* <summary> - fjern browserens standard-triangel og goer hele raekken klikbar/tydelig */
 .sectionTitle {
-  font-size: var(--qo-font-size-lg);
+  font-size: 1rem;
   font-weight: 700;
   color: var(--qo-color-heading);
   margin: 0;
-  padding-bottom: var(--qo-space-1);
+  padding-bottom: var(--qo-space-2);
   border-bottom: 1px solid var(--qo-color-border);
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 32px;
+}
+
+.sectionTitle::-webkit-details-marker {
+  display: none;
+}
+
+.sectionTitle::after {
+  content: "\2212"; /* minus - aaben tilstand */
+  font-weight: 400;
+  opacity: 0.6;
+}
+
+details:not([open]) > .sectionTitle::after {
+  content: "+"; /* lukket tilstand */
+}
+
+details:not([open]) > .sectionTitle {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.sectionBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--qo-space-3);
+  padding-top: var(--qo-space-3);
 }

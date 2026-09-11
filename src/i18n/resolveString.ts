@@ -27,13 +27,26 @@ function getByPath(source: Record<string, unknown>, path: string): unknown {
 
 /**
  * Slaar en stabil string-ID op (fx "forms.mist.disclaimer").
+ * `runtimeOverride` er en admin-importeret oversaettelse (se
+ * storage/translationOverrides.ts) og har forrang over den kompilerede
+ * sprogpakke, men er ALDRIG automatisk "godkendt" - kun markeret som
+ * importeret udkast (isPendingApproval forbliver true for alt andet end
+ * dansk, uanset override).
  * Falder tilbage til dansk, hvis sproget mangler en godkendt oversaettelse.
  * Raa PENDING_NATIVE_TRANSLATION-tekst vises aldrig i UI'et.
  */
-export function resolveString(lang: LanguageCode, key: string): ResolvedString {
-  const inLanguage = lang === "da" ? undefined : getByPath(packs[lang], key);
+export function resolveString(
+  lang: LanguageCode,
+  key: string,
+  runtimeOverride?: Record<string, string>,
+): ResolvedString {
+  const overridden = lang !== "da" ? runtimeOverride?.[key] : undefined;
+  const inLanguage = overridden ?? (lang === "da" ? undefined : getByPath(packs[lang], key));
 
   if (typeof inLanguage === "string" && inLanguage.length > 0) {
+    // Vist paa det valgte sprog (kompileret udkast eller admin-importeret) -
+    // IKKE dansk fallback. "Godkendt" er en separat, ikke-automatisk status,
+    // kommunikeret via sprogstatusbanneret, ikke denne markoer.
     return { text: inLanguage, isPendingApproval: false };
   }
 

@@ -1,0 +1,53 @@
+.modeContainer {
+  width: 100%;
+  max-width: var(--qo-max-content-width);
+  margin: 0 auto;
+  padding: 16px 16px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modeTitle {
+  color: var(--qo-color-heading);
+  margin: 0;
+}
+
+.modeButton {
+  min-height: 80px;
+  padding: 16px;
+  border-radius: 14px;
+  border: 2px solid var(--qo-color-heading);
+  background: var(--qo-color-primary);
+  color: var(--qo-color-text-on-dark);
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.modeButtonSub {
+  font-weight: 400;
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.actionButton {
+  min-height: 48px;
+  padding: 0 16px;
+  border-radius: 10px;
+  border: 2px solid var(--qo-color-heading);
+  background: transparent;
+  color: var(--qo-color-heading);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.actionsRow {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}

@@ -4,12 +4,15 @@ import { fieldStyles as styles } from "./fieldSharedStyles";
 import { useTranslation } from "../../i18n/useTranslation";
 import { MapView } from "../MapView";
 
+type PositionSource = "auto" | "manual" | null;
+
 interface GpsFieldProps {
   id: string;
   labelId: string;
   helpId?: string;
   value: string;
-  onChange: (value: string) => void;
+  source: PositionSource;
+  onChange: (value: string, source: "auto" | "manual") => void;
 }
 
 function parseLatLng(value: string): { lat: number; lng: number } | null {
@@ -21,10 +24,12 @@ function parseLatLng(value: string): { lat: number; lng: number } | null {
 /**
  * GPS-felt: kan udfyldes automatisk via enhedens geolocation-API, men
  * feltet er altid et almindeligt, frit redigerbart tekstfelt bagefter -
- * "automatisk, men altid rettes manuelt". Valgfri kortvisning (Leaflet/
+ * "automatisk, men altid rettes manuelt". Registrerer, om den gemte
+ * position stammer fra automatisk hentning eller manuel indtastning/
+ * korrektion (vist i rapportens metadata). Valgfri kortvisning (Leaflet/
  * OSM) tillader ogsaa manuel placering ved tryk paa kortet.
  */
-export function GpsField({ id, labelId, helpId, value, onChange }: GpsFieldProps) {
+export function GpsField({ id, labelId, helpId, value, source, onChange }: GpsFieldProps) {
   const { t } = useTranslation();
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -42,7 +47,7 @@ export function GpsField({ id, labelId, helpId, value, onChange }: GpsFieldProps
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const { latitude, longitude, accuracy } = pos.coords;
-        onChange(`${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
+        onChange(`${latitude.toFixed(5)}, ${longitude.toFixed(5)}`, "auto");
         setReadout({ accuracy, timestamp: new Date(pos.timestamp).toISOString() });
         setStatus("idle");
       },
@@ -66,7 +71,7 @@ export function GpsField({ id, labelId, helpId, value, onChange }: GpsFieldProps
           type="text"
           value={value}
           placeholder="fx 65.60000, -37.63000"
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e) => onChange(e.target.value, "manual")}
         />
         <button type="button" className={styles.smallButton} onClick={handleFetch}>
           {status === "loading" ? t("fields.gps.loading") : t("fields.gps.fetch")}
@@ -85,14 +90,13 @@ export function GpsField({ id, labelId, helpId, value, onChange }: GpsFieldProps
           {new Date(readout.timestamp).toLocaleTimeString("da-DK")}
         </p>
       )}
+      {source === "manual" && value && (
+        <p style={{ fontSize: "0.75rem", opacity: 0.7, margin: 0 }}>{t("fields.gps.manuallyEdited")}</p>
+      )}
       {showMap && (
         <MapView
-          markers={
-            parsed
-              ? [{ id: "current", latitude: parsed.lat, longitude: parsed.lng, label: t(labelId) }]
-              : []
-          }
-          onPick={(lat, lng) => onChange(`${lat.toFixed(5)}, ${lng.toFixed(5)}`)}
+          markers={parsed ? [{ id: "current", latitude: parsed.lat, longitude: parsed.lng, label: t(labelId) }] : []}
+          onPick={(lat, lng) => onChange(`${lat.toFixed(5)}, ${lng.toFixed(5)}`, "manual")}
           showCurrentLocation
           heightPx={220}
         />

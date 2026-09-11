@@ -4,6 +4,41 @@
   gap: var(--qo-space-3);
 }
 
+.documentCard {
+  border: 2px solid var(--qo-color-primary);
+  border-radius: var(--qo-radius-lg);
+  padding: var(--qo-space-4);
+  background: #eef3ea;
+  display: flex;
+  flex-direction: column;
+  gap: var(--qo-space-3);
+  box-shadow: 0 2px 6px rgba(18, 24, 17, 0.08);
+}
+
+:root[data-qo-theme="dark"] .documentCard {
+  background: #17211a;
+  border-color: #3a5a34;
+}
+
+.documentTitle {
+  margin: 0;
+  font-size: var(--qo-font-size-lg);
+  font-weight: 800;
+  color: var(--qo-color-heading);
+}
+
+.buttonGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--qo-space-2);
+}
+
+@media (min-width: 480px) {
+  .buttonGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
 .buttonRow {
   display: flex;
   gap: var(--qo-space-2);
@@ -12,13 +47,20 @@
 
 .captureButton {
   min-height: var(--qo-touch-target-min);
-  padding: 0 var(--qo-space-4);
+  padding: var(--qo-space-2) var(--qo-space-3);
   border-radius: var(--qo-radius);
   border: 2px solid var(--qo-color-primary);
   background: var(--qo-color-primary);
   color: var(--qo-color-text-on-dark);
   font-weight: 600;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  text-align: center;
+  font-size: 0.85rem;
 }
 
 .secondaryButton {
@@ -44,11 +86,12 @@
 
 .item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--qo-space-3);
   padding: var(--qo-space-2);
   border: 1px solid var(--qo-color-border);
   border-radius: var(--qo-radius);
+  flex-wrap: wrap;
 }
 
 .thumb {
@@ -62,12 +105,27 @@
 
 .itemInfo {
   flex: 1;
-  min-width: 0;
+  min-width: 160px;
   font-size: var(--qo-font-size-sm);
 }
 
 .itemInfo p {
   margin: 0;
+}
+
+.metaLine {
+  opacity: 0.7;
+  font-size: 0.8rem;
+}
+
+.originTag {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--qo-color-border);
+  margin-left: 6px;
 }
 
 .deleteButton {
